@@ -1,0 +1,2089 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sand:#F7F3EA;--sand-2:#EFE8DA;--kort:#FFFFFF;
+  --petrol:#2F4A52;--petrol-2:#4E6B72;--petrol-3:#8FA3A7;
+  --linje:#E4DCCB;
+  --gull:#C9963F;--gull-2:#F6ECD8;
+  --salvie:#7E8E80;--salvie-2:#E4EBE3;
+  --leire:#B4705A;--leire-2:#F7E7E1;
+  --r-s:12px;--r-m:18px;--r-l:26px;
+  --d:"Outfit",system-ui,sans-serif;--b:"Public Sans",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{color-scheme:light}
+body{background:var(--sand);color:var(--petrol);font-family:var(--b);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.shell{max-width:660px;margin:0 auto;padding:14px 16px 104px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:20px}
+.logo{display:flex;align-items:center;gap:9px}
+.logo svg{width:26px;height:26px}
+.logo .n{font-family:var(--d);font-weight:700;font-size:23px;letter-spacing:-.03em}
+.valgt{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.tagbtn{font-family:var(--b);font-size:12.5px;font-weight:500;background:var(--sand-2);color:var(--petrol-2);border:none;padding:6px 12px;border-radius:20px;cursor:pointer}
+.skjerm{display:none}.skjerm.on{display:block}
+h1{font-family:var(--d);font-size:26px;font-weight:700;letter-spacing:-.03em;line-height:1.18;margin-bottom:4px}
+.u{color:var(--petrol-2);font-size:14.5px;margin-bottom:20px}
+h2{font-family:var(--d);font-size:17px;font-weight:600;letter-spacing:-.02em;margin:22px 0 10px;color:var(--petrol-2)}
+.tilbake{background:none;border:none;font-family:var(--b);font-size:13.5px;color:var(--petrol-2);cursor:pointer;padding:0;margin-bottom:12px}
+.trinnrad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.tr{font-family:var(--d);font-weight:600;font-size:20px;padding:16px 8px;border-radius:var(--r-m);border:1.5px solid var(--linje);background:var(--kort);color:var(--petrol);cursor:pointer;text-align:center}
+.tr small{display:block;font-family:var(--b);font-weight:400;font-size:12px;color:var(--petrol-3)}
+.tr.valgt{border-color:var(--petrol);background:var(--petrol);color:var(--sand)}
+.tr.valgt small{color:var(--petrol-3)}
+.fagnett{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+@media(min-width:540px){.fagnett{grid-template-columns:repeat(3,1fr)}}
+.fag{border:1.5px solid var(--linje);border-radius:var(--r-m);padding:14px 13px;background:var(--kort);cursor:pointer;text-align:left;font-family:var(--b)}
+.fag .ik{width:8px;height:8px;border-radius:50%;display:block;margin-bottom:10px}
+.fag .n{font-family:var(--d);font-weight:600;font-size:15.5px;color:var(--petrol);display:block;line-height:1.25}
+.fag .s{font-size:12px;color:var(--petrol-3);display:block}
+.fag.snart{opacity:.55}.fag.snart .s{color:var(--leire)}
+.rute{position:relative;padding-left:44px}
+.rute::before{content:"";position:absolute;left:15px;top:16px;bottom:16px;width:2px;background:var(--linje)}
+.rutefyll{position:absolute;left:15px;top:16px;width:2px;background:var(--petrol);transition:height .7s ease}
+.stopp{position:relative;display:block;width:100%;text-align:left;background:var(--kort);border:1.5px solid var(--linje);border-radius:var(--r-m);padding:14px 16px;margin-bottom:10px;cursor:pointer;font-family:var(--b)}
+.flagg{position:absolute;left:-44px;top:16px;width:32px;height:32px;border-radius:50%;background:var(--sand);border:1.5px solid var(--linje);display:flex;align-items:center;justify-content:center;font-family:var(--d);font-weight:600;font-size:13px;color:var(--petrol-3)}
+.stopp.ok .flagg{background:var(--petrol);border-color:var(--petrol);color:var(--sand)}
+.stopp.paa .flagg{border-color:var(--gull);color:var(--gull);background:var(--gull-2)}
+.stopp .sn{font-family:var(--d);font-weight:600;font-size:16.5px;display:block;line-height:1.3;letter-spacing:-.01em}
+.stopp .sm{font-size:12.5px;color:var(--petrol-3);display:block;margin-top:2px;line-height:1.45}
+.stopp .lock{font-size:12.5px;color:var(--leire);display:block;margin-top:5px}
+.merknad{background:var(--gull-2);border-left:3px solid var(--gull);border-radius:var(--r-s);padding:11px 14px;font-size:13.5px;color:#6E5116;margin-bottom:14px}
+
+/* emneside */
+.maalkort{background:var(--kort);border:1.5px solid var(--linje);border-radius:var(--r-m);padding:15px 17px;margin-bottom:18px}
+.maalkort .lab{font-size:11.5px;color:var(--petrol-3);text-transform:uppercase;letter-spacing:.05em}
+.maalkort .txt{font-size:14.5px;color:var(--petrol-2);margin-top:3px;line-height:1.5}
+.del{display:block;width:100%;text-align:left;background:var(--kort);border:1.5px solid var(--linje);border-radius:var(--r-m);padding:14px 16px;margin-bottom:10px;cursor:pointer;font-family:var(--b);display:flex;gap:13px;align-items:center}
+.del .m{width:30px;height:30px;flex-shrink:0;border-radius:50%;border:1.5px solid var(--linje);display:flex;align-items:center;justify-content:center;font-family:var(--d);font-weight:600;font-size:13px;color:var(--petrol-3)}
+.del.ok .m{background:var(--salvie);border-color:var(--salvie);color:#fff}
+.del .tt{font-family:var(--d);font-weight:600;font-size:16px;display:block;line-height:1.25}
+.del .ss{font-size:12.5px;color:var(--petrol-3);display:block}
+.del.laast{opacity:.5;cursor:not-allowed}
+.del.test{border-color:var(--gull);background:var(--gull-2)}
+.del.test.ok{border-color:var(--salvie);background:var(--salvie-2)}
+
+/* lær */
+.laer{background:var(--kort);border:1.5px solid var(--linje);border-radius:var(--r-l);padding:22px 20px;margin-bottom:12px}
+.laer h3{font-family:var(--d);font-weight:600;font-size:18px;margin-bottom:6px;letter-spacing:-.02em}
+.laer p{font-size:15.5px;color:var(--petrol-2);margin-bottom:16px;line-height:1.6}
+.laer p:last-child{margin-bottom:0}
+.laer .eks{background:var(--sand);border-radius:var(--r-s);padding:12px 14px;font-family:var(--d);font-weight:500;font-size:16.5px;color:var(--petrol);margin-bottom:16px}
+.laer .adv{background:var(--leire-2);border-left:3px solid var(--leire);border-radius:var(--r-s);padding:11px 14px;font-size:14.5px;color:#7A3F2C;margin-bottom:16px}
+
+/* øving */
+.hero{background:var(--kort);border:1.5px solid var(--linje);border-radius:var(--r-l);padding:22px 20px}
+.heroin{display:flex;gap:16px;align-items:flex-start}
+.mwrap{flex-shrink:0;width:84px;height:84px}
+.mask{width:84px;height:84px;transform-origin:50% 50%}
+.hvem{font-size:11.5px;color:var(--petrol-3);letter-spacing:.05em;text-transform:uppercase}
+.sier{font-family:var(--d);font-weight:500;font-size:19.5px;line-height:1.42;min-height:58px;letter-spacing:-.01em}
+.sier b{font-weight:700;color:var(--gull)}
+@keyframes flyt{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-7px) rotate(4deg)}}
+@keyframes jubel{0%{transform:translateY(0) scale(1) rotate(0)}18%{transform:translateY(-26px) scale(1.16) rotate(-12deg)}38%{transform:translateY(2px) scale(.93) rotate(6deg)}56%{transform:translateY(-12px) scale(1.06) rotate(-4deg)}100%{transform:translateY(0) scale(1) rotate(0)}}
+@keyframes tenk{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+@keyframes sukk{0%{transform:scale(1,1) translateY(0)}30%{transform:scale(1.1,.86) translateY(7px)}55%{transform:scale(.96,1.04) translateY(-2px)}100%{transform:scale(1,1) translateY(0)}}
+.mask{animation:flyt 4.2s ease-in-out infinite}
+.mask.jubel{animation:jubel .95s cubic-bezier(.3,1.2,.4,1)}
+.mask.tenk{animation:tenk 1.15s ease-in-out infinite}
+.mask.sukk{animation:sukk .85s ease-in-out}
+.mini{transform-origin:50px 50px;animation:bane 7s linear infinite}
+@keyframes bane{to{transform:rotate(360deg)}}
+.mask.tenk .mini{animation-duration:1.4s}
+.glimt{opacity:0}.glimt.on{animation:blafre .95s ease-out}
+@keyframes blafre{0%{opacity:0;transform:scale(.2)}30%{opacity:1;transform:scale(1.25)}100%{opacity:0;transform:scale(1.5)}}
+@media(prefers-reduced-motion:reduce){.mask,.mask.jubel,.mask.tenk,.mask.sukk,.mini,.glimt.on{animation:none}}
+.inn{margin-top:20px}
+.inn>label{display:block;font-size:12.5px;color:var(--petrol-3);margin-bottom:7px}
+.felt{display:flex;gap:9px}
+.felt input{flex:1;min-width:0;font-family:var(--d);font-weight:500;font-size:19px;color:var(--petrol);padding:13px 16px;border-radius:var(--r-m);border:1.5px solid var(--linje);background:var(--sand)}
+.felt input:focus{outline:none;border-color:var(--petrol)}
+button.hoved{font-family:var(--d);font-weight:600;font-size:16.5px;cursor:pointer;padding:13px 24px;border-radius:var(--r-m);border:none;background:var(--petrol);color:var(--sand)}
+button.hoved:active{transform:translateY(1.5px)}
+button.hoved.full{width:100%}
+.mld{font-size:14.5px;margin-top:10px;display:none;padding:11px 14px;border-radius:var(--r-s);background:var(--gull-2);color:#6E5116;border-left:3px solid var(--gull)}
+.mld.on{display:block}
+.stige{margin-top:14px}
+.hjelperad{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hjelpknapp{font-family:var(--d);font-weight:600;font-size:14.5px;padding:10px 18px;border-radius:20px;background:var(--sand-2);color:var(--petrol);border:1.5px solid var(--linje);cursor:pointer}
+.hjelpknapp:hover{border-color:var(--petrol-3)}
+.hjelpknapp[disabled]{opacity:.45;cursor:default}
+.nivaa{font-size:12.5px;color:var(--petrol-3)}
+.gitt{margin-top:12px}
+.hjelpekort{background:var(--sand);border-left:3px solid var(--salvie);border-radius:var(--r-s);padding:12px 14px;margin-bottom:8px}
+.hjelpekort .hn{font-size:11.5px;color:var(--petrol-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.hjelpekort .ht{font-size:14.5px;color:var(--petrol-2);line-height:1.55}
+.hjelpekort.dyp{border-left-color:var(--gull);background:var(--gull-2)}
+.hjelpekort.dyp .ht{color:#6E5116}
+.hjelpekort .eks2{margin-top:8px;background:var(--kort);border-radius:8px;padding:9px 11px;font-family:var(--d);font-weight:500;font-size:15px;color:var(--petrol)}
+.opplast{margin-top:14px;padding-top:14px;border-top:1px solid var(--linje)}
+.opplast .ol{font-size:12.5px;color:var(--petrol-3);margin-bottom:8px}
+.olrad{display:flex;gap:8px;flex-wrap:wrap}
+.olknapp{font-family:var(--b);font-weight:500;font-size:13.5px;padding:9px 15px;border-radius:20px;background:var(--kort);color:var(--petrol-2);border:1.5px solid var(--linje);cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.olknapp svg{width:16px;height:16px}
+.olknapp:hover{border-color:var(--petrol-3)}
+input[type=file]{display:none}
+.forhaand{margin-top:12px;display:none}
+.forhaand.on{display:block}
+.forhaand img{width:100%;max-height:260px;object-fit:contain;border-radius:var(--r-m);border:1.5px solid var(--linje);background:var(--sand)}
+.forhaand .bt{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:10px}
+.forhaand .bs{font-size:13px;color:var(--petrol-2)}
+.fjern{background:none;border:none;font-family:var(--b);font-size:13px;color:var(--leire);cursor:pointer;padding:0}
+.spor{margin-top:14px;background:var(--kort);border:1.5px solid var(--linje);border-radius:var(--r-l);padding:20px}
+.spor h2{margin:0 0 2px;font-size:16px;color:var(--petrol)}
+.spor .u{font-size:12.5px;margin-bottom:16px}
+.sti{position:relative;padding-left:32px}
+.sti::before{content:"";position:absolute;left:10px;top:7px;bottom:7px;width:2px;background:var(--linje)}
+.stifyll{position:absolute;left:10px;top:7px;width:2px;background:var(--petrol);height:0;transition:height .6s ease}
+.node{position:relative;margin-bottom:15px}.node:last-child{margin-bottom:0}
+.kule{position:absolute;left:-32px;top:1px;width:22px;height:22px;border-radius:50%;background:var(--sand);border:1.5px solid var(--linje);display:flex;align-items:center;justify-content:center;font-family:var(--d);font-weight:600;font-size:12px;color:var(--petrol-3)}
+.node.ferdig .kule{background:var(--petrol);border-color:var(--petrol);color:var(--sand)}
+.node.naa .kule{border-color:var(--gull);color:var(--gull);background:var(--gull-2)}
+.nt{font-size:14px;color:var(--petrol-2)}
+.mitt{display:inline-block;margin-top:4px;font-family:var(--d);font-weight:600;font-size:15px;background:var(--salvie-2);color:#40584A;padding:3px 12px;border-radius:14px}
+.venter{font-size:13.5px;color:var(--petrol-3)}
+.slutt{display:none;margin-top:14px;border-radius:var(--r-l);padding:24px 22px;background:var(--petrol);color:var(--sand)}
+.slutt.on{display:block}
+.slutt .h{font-family:var(--d);font-weight:700;font-size:22px;letter-spacing:-.02em;margin-bottom:6px}
+.slutt p{font-size:14.5px;color:#B9C9CC}
+.sluttknapper{margin-top:16px}
+.sluttknapper button{background:var(--sand);color:var(--petrol);width:100%}
+
+/* test */
+.tprog{display:flex;gap:6px;margin-bottom:18px}
+.tp{height:6px;flex:1;border-radius:6px;background:var(--linje)}
+.tp.on{background:var(--petrol)}
+.tkort{background:var(--kort);border:1.5px solid var(--linje);border-radius:var(--r-l);padding:22px 20px}
+.tq{font-family:var(--d);font-weight:600;font-size:20px;line-height:1.35;letter-spacing:-.02em;margin-bottom:18px}
+.alt{display:block;width:100%;text-align:left;background:var(--sand);border:1.5px solid var(--linje);border-radius:var(--r-m);padding:13px 16px;margin-bottom:9px;cursor:pointer;font-family:var(--d);font-weight:500;font-size:16.5px;color:var(--petrol)}
+.alt:hover{border-color:var(--petrol-3)}
+.alt.riktig{background:var(--salvie-2);border-color:var(--salvie);color:#2E4A3C}
+.alt.galt{background:var(--leire-2);border-color:var(--leire);color:#7A3F2C}
+.alt[disabled]{cursor:default}
+.forkl{display:none;margin-top:14px;padding:13px 15px;border-radius:var(--r-s);background:var(--sand-2);font-size:14.5px;color:var(--petrol-2);line-height:1.55}
+.forkl.on{display:block}
+.fasit{background:var(--kort);border:1.5px solid var(--linje);border-radius:var(--r-l);padding:26px 22px;text-align:center}
+.fasit .score{font-family:var(--d);font-weight:700;font-size:52px;line-height:1;letter-spacing:-.04em}
+.fasit .st{font-size:15px;color:var(--petrol-2);margin:6px 0 18px}
+.fasit.best .score{color:var(--salvie)}
+.fasit.ikke .score{color:var(--leire)}
+
+.tall{background:var(--kort);border:1.5px solid var(--linje);border-radius:var(--r-l);padding:24px;text-align:center;margin-bottom:14px}
+.tall .n{font-family:var(--d);font-weight:700;font-size:54px;line-height:1;letter-spacing:-.04em}
+.tall .l{font-size:14px;color:var(--petrol-2);margin-top:4px}
+.himmel{background:#22383F;border-radius:var(--r-l);padding:4px;margin-bottom:14px;position:relative;overflow:hidden}
+.himmel svg{display:block;width:100%;height:auto;border-radius:22px}
+.stjerne{cursor:pointer}
+.stjerne .kropp{transform-origin:center;transform-box:fill-box}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.55}}
+@keyframes komfram{0%{opacity:0;transform:scale(.2)}60%{opacity:1;transform:scale(1.3)}100%{opacity:1;transform:scale(1)}}
+.stjerne .kropp{animation:blink 4s ease-in-out infinite}
+.stjerne.ny .kropp{animation:komfram .9s cubic-bezier(.3,1.4,.5,1),blink 4s ease-in-out infinite .9s}
+@media(prefers-reduced-motion:reduce){.stjerne .kropp,.stjerne.ny .kropp{animation:none}}
+.himmeltom{padding:44px 24px;text-align:center}
+.himmeltom p{color:#8FA3A7;font-size:14.5px;line-height:1.6}
+.valgtstjerne{background:var(--kort);border:1.5px solid var(--linje);border-left:3px solid var(--gull);border-radius:var(--r-m);padding:16px 18px;margin-bottom:14px;display:none}
+.valgtstjerne.on{display:block}
+.valgtstjerne .t{font-family:var(--d);font-weight:500;font-size:17px;line-height:1.4}
+.valgtstjerne .d{font-size:12.5px;color:var(--petrol-3);margin-top:5px}
+.hstat{display:flex;gap:9px;margin-bottom:14px}
+.hs{flex:1;background:var(--kort);border:1.5px solid var(--linje);border-radius:var(--r-m);padding:14px;text-align:center}
+.hs .n{font-family:var(--d);font-weight:700;font-size:30px;line-height:1;letter-spacing:-.03em}
+.hs .l{font-size:12.5px;color:var(--petrol-2);margin-top:3px;line-height:1.35}
+.notat{background:var(--kort);border:1.5px solid var(--linje);border-left:3px solid var(--gull);border-radius:var(--r-m);padding:15px 17px;margin-bottom:10px}
+.notat .t{font-family:var(--d);font-weight:500;font-size:16.5px;line-height:1.4}
+.notat .d{font-size:12px;color:var(--petrol-3);margin-top:4px}
+.tomt{color:var(--petrol-3);font-size:15px}
+.lp{background:var(--kort);border:1.5px solid var(--linje);border-radius:var(--r-l);padding:20px;margin-bottom:12px}
+.lp .kode{font-family:var(--d);font-weight:700;font-size:22px;letter-spacing:-.02em}
+.lp .fagn{font-size:13.5px;color:var(--petrol-2);margin-bottom:12px}
+.lpr{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--linje);font-size:14px}
+.lpr .k{color:var(--petrol-2)}
+.lpr .v{font-family:var(--d);font-weight:600;text-align:right}
+.varsel{margin-top:12px;padding:11px 13px;border-radius:var(--r-s);font-size:13.5px;background:var(--salvie-2);color:#40584A;border-left:3px solid var(--salvie)}
+.lpinfo{background:var(--kort);border:1.5px solid var(--linje);border-radius:var(--r-l);padding:20px}
+.lpinfo h3{font-family:var(--d);font-weight:600;font-size:16.5px;margin-bottom:10px}
+.lpinfo ol{margin-left:18px;color:var(--petrol-2);font-size:14.5px}
+.lpinfo li{margin-bottom:7px}
+.lpinfo code{font-family:ui-monospace,monospace;font-size:13px;background:var(--sand-2);padding:1px 6px;border-radius:5px}
+/* spill */
+.hud{display:flex;justify-content:space-between;gap:8px;margin-bottom:10px;font-size:13.5px;color:var(--petrol-2)}
+.hudv b{font-family:var(--d);font-weight:700;color:var(--petrol)}
+#liv{font-family:var(--d);font-size:16px;color:var(--leire);letter-spacing:2px}
+.vei{position:relative;height:400px;background:linear-gradient(#33434A,#3C4D54);border-radius:var(--r-l);overflow:hidden;
+  border-left:8px solid var(--sand-2);border-right:8px solid var(--sand-2);touch-action:manipulation;user-select:none}
+.stripe{position:absolute;top:-60px;width:4px;height:calc(100% + 120px);margin-left:-2px;
+  background:repeating-linear-gradient(to bottom,rgba(244,210,140,.75) 0 24px,transparent 24px 56px);
+  animation:rull .42s linear infinite}
+@keyframes rull{to{transform:translateY(56px)}}
+.vei.pause .stripe,.vei.pause .kant{animation-play-state:paused}
+.kant{position:absolute;top:-60px;width:6px;height:calc(100% + 120px);
+  background:repeating-linear-gradient(to bottom,rgba(247,243,234,.5) 0 40px,transparent 40px 80px);
+  animation:rull .42s linear infinite}
+.bil{position:absolute;bottom:130px;width:42px;height:70px;transition:left .11s cubic-bezier(.3,1.3,.5,1);z-index:3;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))}
+.bil svg{width:100%;height:100%}
+.bil.krasj{animation:krasj .55s}
+@keyframes krasj{0%,100%{transform:translateX(0) rotate(0)}20%{transform:translateX(-10px) rotate(-12deg)}
+ 50%{transform:translateX(9px) rotate(11deg)}80%{transform:translateX(-5px) rotate(-5deg)}}
+.blokk{position:absolute;width:52px;height:44px;border-radius:9px;z-index:2;
+  display:flex;align-items:center;justify-content:center;font-family:var(--d);font-weight:800;font-size:19px;color:#fff;
+  background:var(--leire);box-shadow:0 4px 0 #8E5442,0 6px 12px rgba(0,0,0,.3)}
+.styr{font-size:12.5px;color:var(--petrol-3);margin-top:9px;text-align:center}
+.politi{position:absolute;bottom:-110px;width:42px;height:70px;z-index:4;transition:bottom 3.6s cubic-bezier(.4,0,.6,1),left .3s ease;
+  filter:drop-shadow(0 6px 12px rgba(0,0,0,.45))}
+.politi svg{width:100%;height:100%}
+.blaalys{animation:blaalys .34s steps(1) infinite}
+@keyframes blaalys{0%,49%{fill:#3B6CF6;opacity:1}50%,100%{fill:#E23B3B;opacity:1}}
+.vei.jakt{animation:sirene .34s steps(1) infinite}
+@keyframes sirene{0%,49%{box-shadow:inset 0 0 60px 10px rgba(59,108,246,.35)}50%,100%{box-shadow:inset 0 0 60px 10px rgba(226,59,59,.35)}}
+.arrest{background:#22383F;color:var(--sand);border-radius:var(--r-l);padding:30px 24px;text-align:center;margin-top:14px}
+.arrest .stjut{font-family:var(--d);font-weight:800;font-size:30px;letter-spacing:-.02em;line-height:1.1;margin-bottom:8px}
+.arrest .sikt{font-size:15px;color:#B9C9CC;line-height:1.6;margin-bottom:16px}
+.arrest .papir{background:rgba(255,255,255,.08);border-radius:var(--r-m);padding:16px;text-align:left;margin-bottom:18px}
+.arrest .pr{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font-size:14px;color:#B9C9CC}
+.arrest .pr b{font-family:var(--d);font-weight:600;color:var(--sand)}
+.arrest button{background:var(--sand);color:var(--petrol)}
+@media(prefers-reduced-motion:reduce){.blaalys,.vei.jakt{animation:none}}
+.kombo{position:absolute;left:50%;top:38%;transform:translateX(-50%);z-index:4;
+  font-family:var(--d);font-weight:800;font-size:26px;color:#F4D28C;opacity:0;pointer-events:none;
+  text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.kombo.vis{animation:komboopp .9s ease-out}
+@keyframes komboopp{0%{opacity:0;transform:translate(-50%,10px) scale(.7)}
+ 30%{opacity:1;transform:translate(-50%,-6px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-34px) scale(1)}}
+@media(prefers-reduced-motion:reduce){.stripe,.kant,.bil.krasj,.kombo.vis{animation:none}}
+.sporsmal{display:none;margin-top:14px;background:var(--kort);border:1.5px solid var(--linje);border-radius:var(--r-l);padding:20px}
+.sporsmal.on{display:block}
+.sqemne{font-size:11.5px;color:var(--petrol-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.sq{font-family:var(--d);font-weight:600;font-size:18.5px;line-height:1.35;margin-bottom:14px}
+.tidsbar{height:6px;background:var(--linje);border-radius:6px;margin-top:12px;overflow:hidden}
+.tidsbar span{display:block;height:100%;background:var(--gull)}
+.politi{position:absolute;bottom:-80px;width:44px;height:74px;transition:left .11s cubic-bezier(.3,1.3,.5,1);z-index:4;display:none;
+  filter:drop-shadow(0 -6px 12px rgba(59,123,224,.5))}
+.politi.on{display:block}
+.politi svg{width:100%;height:100%}
+.lys1{animation:blaalys .45s steps(1) infinite}
+.lys2{animation:blaalys .45s steps(1) infinite .225s}
+@keyframes blaalys{0%,49%{opacity:1}50%,100%{opacity:.15}}
+.sirene{position:absolute;inset:0;pointer-events:none;z-index:1;display:none}
+.sirene.on{display:block;animation:sirenepuls .45s steps(1) infinite}
+@keyframes sirenepuls{0%,49%{background:rgba(59,123,224,.22)}50%,100%{background:rgba(217,74,61,.22)}}
+@media(prefers-reduced-motion:reduce){.lys1,.lys2,.sirene.on{animation:none}}
+.gslutt{background:var(--kort);border:1.5px solid var(--linje);border-radius:var(--r-l);padding:26px 22px;text-align:center;margin-top:14px}
+.gslutt .n{font-family:var(--d);font-weight:700;font-size:46px;line-height:1;letter-spacing:-.04em;color:var(--gull)}
+.gslutt .l{font-size:14.5px;color:var(--petrol-2);margin:6px 0 16px}
+.gradrad{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+@media(min-width:520px){.gradrad{grid-template-columns:repeat(4,1fr)}}
+.gr{border:1.5px solid var(--linje);border-radius:var(--r-m);padding:14px 10px;font-family:var(--d);font-weight:600;font-size:16px;background:var(--kort);color:var(--petrol);cursor:pointer;text-align:center}
+.gr small{display:block;font-family:var(--b);font-weight:400;font-size:11.5px;color:var(--petrol-3)}
+.gr.valgt{border-color:var(--petrol);background:var(--petrol);color:var(--sand)}
+.gr.valgt small{color:var(--petrol-3)}
+/* ---- port: registrering, innlogging, betaling ---- */
+.port{position:fixed;inset:0;background:var(--sand);z-index:60;overflow-y:auto;display:none}
+.port.on{display:block}
+.portinn{max-width:440px;margin:0 auto;padding:28px 20px 60px;min-height:100%}
+.portlogo{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:26px}
+.portlogo svg{width:30px;height:30px}
+.portlogo span{font-family:var(--d);font-weight:700;font-size:26px;letter-spacing:-.03em}
+.pk{background:var(--kort);border:1.5px solid var(--linje);border-radius:var(--r-l);padding:26px 22px}
+.pk h2{font-family:var(--d);font-weight:700;font-size:24px;letter-spacing:-.025em;margin:0 0 6px;color:var(--petrol)}
+.pk .pu{font-size:14.5px;color:var(--petrol-2);margin-bottom:20px;line-height:1.55}
+.psteg{display:flex;gap:6px;margin-bottom:20px}
+.ps{height:4px;flex:1;border-radius:4px;background:var(--linje)}
+.ps.on{background:var(--petrol)}
+.inpk{margin-bottom:14px}
+.inpk label{display:block;font-size:12.5px;color:var(--petrol-2);margin-bottom:5px;font-weight:500}
+.inpk input,.inpk select{width:100%;font-family:var(--b);font-size:16px;color:var(--petrol);
+  padding:12px 14px;border-radius:var(--r-m);border:1.5px solid var(--linje);background:var(--sand)}
+.inpk input:focus,.inpk select:focus{outline:none;border-color:var(--petrol)}
+.inpk .hj{font-size:12px;color:var(--petrol-3);margin-top:4px}
+.inpk.feil input{border-color:var(--leire)}
+.inpk .fm{font-size:12.5px;color:var(--leire);margin-top:4px;display:none}
+.inpk.feil .fm{display:block}
+.samtykke{display:flex;gap:11px;align-items:flex-start;background:var(--sand);border-radius:var(--r-m);padding:14px;margin-bottom:16px}
+.samtykke input{margin-top:3px;width:18px;height:18px;flex-shrink:0;accent-color:var(--petrol)}
+.samtykke label{font-size:13.5px;color:var(--petrol-2);line-height:1.5}
+.pknapp{width:100%;font-family:var(--d);font-weight:600;font-size:16.5px;cursor:pointer;padding:14px;
+  border-radius:var(--r-m);border:none;background:var(--petrol);color:var(--sand);margin-top:4px}
+.pknapp:active{transform:translateY(1.5px)}
+.pknapp.sek{background:transparent;color:var(--petrol);border:1.5px solid var(--linje)}
+.plenke{display:block;width:100%;background:none;border:none;font-family:var(--b);font-size:14px;
+  color:var(--petrol-2);text-align:center;margin-top:16px;cursor:pointer;text-decoration:underline}
+.planvalg{border:2px solid var(--linje);border-radius:var(--r-m);padding:16px;margin-bottom:10px;cursor:pointer;
+  background:var(--kort);text-align:left;width:100%;font-family:var(--b);display:block}
+.planvalg.valgt{border-color:var(--petrol);background:var(--sand)}
+.planvalg .pn{font-family:var(--d);font-weight:700;font-size:17px;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.planvalg .pp{font-family:var(--d);font-weight:700;font-size:19px;white-space:nowrap}
+.planvalg .pd{font-size:13px;color:var(--petrol-2);margin-top:4px;line-height:1.45}
+.planvalg .merk{display:inline-block;font-size:11.5px;font-weight:600;background:var(--salvie-2);color:#3B5A4A;
+  padding:2px 9px;border-radius:12px;margin-bottom:7px}
+.gratis{background:var(--salvie-2);border-left:3px solid var(--salvie);border-radius:var(--r-s);
+  padding:12px 14px;font-size:13.5px;color:#3B5A4A;margin:14px 0}
+.betmetode{display:flex;align-items:center;gap:13px;border:2px solid var(--linje);border-radius:var(--r-m);
+  padding:15px;margin-bottom:10px;cursor:pointer;background:var(--kort);width:100%;font-family:var(--b);text-align:left}
+.betmetode.valgt{border-color:var(--petrol)}
+.betmetode .ikon{width:44px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--d);font-weight:700;font-size:12px;color:#fff;flex-shrink:0}
+.betmetode .bn{font-family:var(--d);font-weight:600;font-size:15.5px}
+.betmetode .bd{font-size:12.5px;color:var(--petrol-3)}
+.prisboks{background:var(--petrol);color:var(--sand);border-radius:var(--r-m);padding:18px 20px;margin:4px 0 14px}
+.prisboks .pl{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:#9DB6BB}
+.prisboks .pb{font-family:var(--d);font-weight:800;font-size:42px;line-height:1.05;letter-spacing:-.03em;margin:2px 0 6px}
+.prisboks .pb span{font-size:18px;font-weight:600;letter-spacing:0}
+.prisboks .pf{font-size:13px;color:#BFD0D3;line-height:1.5}
+.prisboks .pf b{color:var(--sand)}
+.trygg{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:var(--petrol-3);margin-top:16px;line-height:1.5}
+.trygg svg{width:15px;height:15px;flex-shrink:0;margin-top:2px}
+.sender{text-align:center;padding:36px 0}
+.sender .sp{width:38px;height:38px;margin:0 auto 16px;border:3px solid var(--linje);border-top-color:var(--petrol);
+  border-radius:50%;animation:snurr2 .8s linear infinite}
+@keyframes snurr2{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.sender .sp{animation:none}}
+.sender p{font-size:15px;color:var(--petrol-2)}
+.kvitt{background:var(--sand);border-radius:var(--r-m);padding:16px;margin:16px 0}
+.kvr{display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:6px 0}
+.kvr .k{color:var(--petrol-2)}
+.kvr .v{font-family:var(--d);font-weight:600;text-align:right}
+.kvr.sum{border-top:1px solid var(--linje);margin-top:6px;padding-top:11px;font-size:16px}
+.kontoknapp{background:var(--sand-2);border:none;border-radius:50%;width:34px;height:34px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;color:var(--petrol);flex-shrink:0}
+.kontoknapp svg{width:18px;height:18px}
+.kfelt{background:var(--kort);border:1.5px solid var(--linje);border-radius:var(--r-m);padding:15px 17px;margin-bottom:10px}
+.kfelt .kl{font-size:12px;color:var(--petrol-3);text-transform:uppercase;letter-spacing:.05em}
+.kfelt .kv{font-family:var(--d);font-weight:600;font-size:16.5px;margin-top:2px}
+.kfelt .kb{font-size:13px;color:var(--petrol-2);margin-top:3px}
+.farlig{background:none;border:none;color:var(--leire);font-family:var(--b);font-size:14px;cursor:pointer;
+  padding:12px 0;text-decoration:underline}
+
+.nav{position:fixed;left:0;right:0;bottom:0;background:rgba(247,243,234,.94);backdrop-filter:blur(10px);border-top:1px solid var(--linje);display:flex;justify-content:center;gap:2px;padding:8px 10px calc(8px + env(safe-area-inset-bottom))}
+.nb{flex:1;max-width:140px;background:transparent;border:none;cursor:pointer;font-family:var(--b);font-size:11.5px;color:var(--petrol-3);padding:7px 4px;border-radius:var(--r-s)}
+.nb svg{display:block;margin:0 auto 3px;width:19px;height:19px}
+.nb.on{color:var(--petrol);background:var(--sand-2)}
+</style>
+</head>
+<body>
+<div class="port on" id="port">
+ <div class="portinn">
+  <div class="portlogo">
+   <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 96 C269.6 189 279 198.4 372 212 C279 225.6 269.6 235 256 328 C242.4 235 233 225.6 140 212 C233 198.4 242.4 189 256 96 Z" fill="#2F4A52"/><path d="M256 352 C261.4 389.2 265.2 393 302.4 398.4 C265.2 403.8 261.4 407.6 256 444.8 C250.6 407.6 246.8 403.8 209.6 398.4 C246.8 393 250.6 389.2 256 352 Z" fill="#7E8E80"/></svg>
+   <span>Peil</span>
+  </div>
+
+  <div class="pk" id="p_start">
+   <h2>Leksehjelp som ikke gir deg svaret</h2>
+   <p class="pu">Alle teorifagene på ungdomstrinnet, forankret i kompetansemålene fra Utdanningsdirektoratet. 199 kr i måneden, ingen bindingstid.</p>
+   <button class="pknapp" id="kLag">Kom i gang — 14 dager gratis</button>
+   <button class="pknapp sek" id="kLogg" style="margin-top:10px">Jeg har konto</button>
+   <p class="trygg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v6c0 4.4-3 7.7-7 9-4-1.3-7-4.6-7-9V6z"/></svg>
+    Betaling med Vipps. Ingen bindingstid — si opp når som helst.</p>
+  </div>
+
+  <div class="pk" id="p_reg" style="display:none">
+   <div class="psteg"><span class="ps on"></span><span class="ps"></span><span class="ps"></span></div>
+   <h2>Opprett konto</h2>
+   <p class="pu">Kontoen tilhører foresatt. Eleven logger inn på samme konto.</p>
+   <div class="inpk" id="f_navn"><label for="r_navn">Navnet ditt</label><input id="r_navn" autocomplete="name" placeholder="Fornavn og etternavn"><p class="fm">Skriv inn navnet ditt.</p></div>
+   <div class="inpk" id="f_epost"><label for="r_epost">E-post</label><input id="r_epost" type="email" autocomplete="email" placeholder="deg@example.no"><p class="hj">Her får du innloggingslenke og kvittering.</p><p class="fm">Skriv inn en gyldig e-postadresse.</p></div>
+   <div class="inpk" id="f_elev"><label for="r_elev">Elevens fornavn</label><input id="r_elev" placeholder="Fornavn"><p class="hj">Vi lagrer bare fornavn.</p><p class="fm">Skriv inn elevens fornavn.</p></div>
+   <div class="inpk"><label for="r_trinn">Trinn</label><select id="r_trinn"><option value="8">8. trinn</option><option value="9">9. trinn</option><option value="10">10. trinn</option></select></div>
+   <div class="inpk"><label for="r_sprak">Fremmedspråk på skolen</label><select id="r_sprak">
+     <option value="">Velg språk</option>
+     <option value="spansk">Spansk</option>
+     <option value="tysk">Tysk</option>
+     <option value="fransk">Fransk</option>
+     <option value="annet">Et annet fremmedspråk</option>
+     <option value="fordypning">Språklig fordypning (ikke fremmedspråk)</option>
+   </select><p class="hj">Bestemmer hvilket språk øvingene i fremmedspråk bruker.</p></div>
+   <div class="samtykke"><input type="checkbox" id="r_samtykke"><label for="r_samtykke">Jeg er foresatt og samtykker til at Peil behandler elevens fornavn, trinn og besvarelser. Data lagres i EU og kan slettes når som helst.</label></div>
+   <button class="pknapp" id="kRegNeste">Fortsett</button>
+   <button class="plenke" id="kRegTilbake">Tilbake</button>
+  </div>
+
+  <div class="pk" id="p_plan" style="display:none">
+   <div class="psteg"><span class="ps on"></span><span class="ps on"></span><span class="ps"></span></div>
+   <h2>Abonnement</h2>
+   <p class="pu">Ett abonnement, alle teorifag. Ingen bindingstid.</p>
+   <button class="planvalg valgt" data-plan="en">
+    <span class="pn">Peil<span class="pp">199 kr</span></span>
+    <span class="pd">Per måned. Alle teorifagene på ungdomstrinnet, 8.–10. trinn. Oversikt for foresatte og egen stjernehimmel.</span></button>
+   <div class="gratis">De første <b>14 dagene er gratis</b>. Du betaler ingenting i dag. Første trekk skjer <b id="planDato">–</b>, og vi varsler deg tre dager før.</div>
+   <button class="pknapp" id="kPlanNeste">Fortsett til betaling</button>
+   <button class="plenke" id="kPlanTilbake">Tilbake</button>
+  </div>
+
+  <div class="pk" id="p_bet" style="display:none">
+   <div class="psteg"><span class="ps on"></span><span class="ps on"></span><span class="ps on"></span></div>
+   <h2>Betaling med Vipps</h2>
+   <p class="pu">Du godkjenner en fast månedlig avtale i Vipps. Første trekk kommer først når gratisperioden er over.</p>
+   <button class="betmetode valgt" data-bet="vipps"><span class="ikon" style="background:#FF5B24">Vipps</span>
+    <span><span class="bn">Vipps</span><span class="bd">Du bekrefter avtalen i Vipps-appen</span></span></button>
+   <div class="prisboks">
+    <p class="pl">Etter 14 gratisdager</p>
+    <p class="pb">199 kr<span>/mnd</span></p>
+    <p class="pf">Trekkes automatisk i Vipps den <b id="betDato">–</b>, og deretter samme dato hver måned. Ingen bindingstid — stopp når du vil.</p>
+   </div>
+   <div class="kvitt">
+    <div class="kvr"><span class="k">I dag</span><span class="v">0 kr</span></div>
+    <div class="kvr"><span class="k">Fra <span id="betDato2">–</span></span><span class="v">199 kr/mnd</span></div>
+    <div class="kvr sum"><span class="k">Å betale nå</span><span class="v">0 kr</span></div>
+   </div>
+   <button class="pknapp" id="kBetNeste">Godkjenn 199 kr/mnd i Vipps</button>
+   <p class="trygg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+    Peil ser aldri kortnummeret eller kontoen din. Hele betalingen håndteres av Vipps, og du kan når som helst stoppe avtalen der.</p>
+   <button class="plenke" id="kBetTilbake">Tilbake</button>
+  </div>
+
+  <div class="pk" id="p_sender" style="display:none">
+   <div class="sender"><div class="sp"></div><p id="senderTekst">Sender deg til Vipps …</p></div>
+  </div>
+
+  <div class="pk" id="p_ferdig" style="display:none">
+   <h2>Alt klart</h2>
+   <p class="pu" id="ferdigTekst">–</p>
+   <div class="kvitt">
+    <div class="kvr"><span class="k">Konto</span><span class="v" id="kvEpost">–</span></div>
+    <div class="kvr"><span class="k">Elev</span><span class="v" id="kvElev">–</span></div>
+    <div class="kvr"><span class="k">Abonnement</span><span class="v" id="kvPlan">–</span></div>
+    <div class="kvr"><span class="k">Betalingsmåte</span><span class="v" id="kvBet">–</span></div>
+    <div class="kvr sum"><span class="k">Første trekk</span><span class="v" id="kvDato">–</span></div>
+   </div>
+   <button class="pknapp" id="kStart">Start med Peil</button>
+  </div>
+
+  <div class="pk" id="p_logg" style="display:none">
+   <h2>Logg inn</h2>
+   <p class="pu">Skriv e-posten din, så sender vi deg en innloggingslenke. Ingen passord å huske.</p>
+   <div class="inpk" id="f_lepost"><label for="l_epost">E-post</label><input id="l_epost" type="email" autocomplete="email" placeholder="deg@example.no"><p class="fm">Skriv inn en gyldig e-postadresse.</p></div>
+   <button class="pknapp" id="kSendLenke">Send innloggingslenke</button>
+   <button class="plenke" id="kLoggTilbake">Tilbake</button>
+  </div>
+
+  <div class="pk" id="p_sjekk" style="display:none">
+   <h2>Sjekk e-posten din</h2>
+   <p class="pu">Vi har sendt en innloggingslenke til <b id="sjekkEpost">–</b>. Lenken er gyldig i 15 minutter.</p>
+   <button class="pknapp" id="kAapne">Åpne lenken</button>
+   <p class="trygg" style="margin-top:14px">I denne demoversjonen sendes ingen e-post. Knappen over gjør det innloggingslenken ville gjort.</p>
+   <button class="plenke" id="kSjekkTilbake">Bruk en annen e-post</button>
+  </div>
+
+ </div>
+</div>
+
+<div class="shell">
+
+<div class="top">
+  <div class="logo">
+    <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 96 C269.6 189 279 198.4 372 212 C279 225.6 269.6 235 256 328 C242.4 235 233 225.6 140 212 C233 198.4 242.4 189 256 96 Z" fill="#2F4A52"/><path d="M256 352 C261.4 389.2 265.2 393 302.4 398.4 C265.2 403.8 261.4 407.6 256 444.8 C250.6 407.6 246.8 403.8 209.6 398.4 C246.8 393 250.6 389.2 256 352 Z" fill="#7E8E80"/></svg>
+    <span class="n">Peil</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="valgt" id="valgt"></div>
+    <button class="kontoknapp" id="aapneKonto" title="Konto" aria-label="Konto">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8.5" r="3.6"/><path d="M4.5 20c.9-4 3.9-6 7.5-6s6.6 2 7.5 6"/></svg>
+    </button>
+  </div>
+</div>
+
+<section class="skjerm on" id="s1">
+  <h1>Hva skal du jobbe med?</h1>
+  <p class="u">Velg trinn først, så fag.</p>
+  <div class="trinnrad" id="trinnrad"></div>
+  <h2>Fag</h2>
+  <div class="fagnett" id="fagnett"></div>
+</section>
+
+<section class="skjerm" id="s2">
+  <h1 id="s2tittel">Ruta di</h1>
+  <p class="u" id="s2under"></p>
+  <div id="s2merk"></div>
+  <div class="rute" id="rute"><div class="rutefyll" id="rutefyll"></div></div>
+  <button class="hoved full" id="leggTil" style="margin-top:14px;background:var(--sand-2);color:var(--petrol)">+ Legg til eget tema</button>
+</section>
+
+<section class="skjerm" id="s10">
+  <button class="tilbake" id="tb10">← Tilbake til ruta</button>
+  <h1>Legg til eget tema</h1>
+  <p class="u">Står du fast på noe som ikke ligger i ruta? Skriv det inn, så tar Peil det med deg.</p>
+  <div class="laer">
+    <label class="ol" for="egetNavn" style="display:block;font-size:12.5px;color:var(--petrol-3);margin-bottom:7px">Hva heter temaet?</label>
+    <div class="felt" style="margin-bottom:16px"><input id="egetNavn" placeholder="For eksempel: Trigonometri" autocomplete="off"></div>
+    <label class="ol" for="egetHva" style="display:block;font-size:12.5px;color:var(--petrol-3);margin-bottom:7px">Hva er det du står fast på?</label>
+    <div class="felt" style="margin-bottom:16px"><input id="egetHva" placeholder="Skriv med egne ord" autocomplete="off"></div>
+    <button class="hoved full" id="lagreEget">Legg til i ruta mi</button>
+  </div>
+</section>
+
+<section class="skjerm" id="s6">
+  <button class="tilbake" id="tb6">← Tilbake til ruta</button>
+  <h1 id="e6tittel"></h1>
+  <p class="u" id="e6status"></p>
+  <div class="maalkort"><p class="lab">Kompetansemål</p><p class="txt" id="e6maal"></p></div>
+  <div id="e6deler"></div>
+</section>
+
+<section class="skjerm" id="s7">
+  <button class="tilbake" id="tb7">← Tilbake til emnet</button>
+  <h1 id="l7tittel">Lær</h1>
+  <p class="u">Les gjennom før du øver. Dette er begrepene du trenger.</p>
+  <div id="l7innhold"></div>
+  <button class="hoved full" id="l7ferdig">Jeg har lest — gå til øving</button>
+</section>
+
+<section class="skjerm" id="s3">
+  <button class="tilbake" id="tb3">← Tilbake til emnet</button>
+  <h1 id="o3tittel" style="font-size:21px;margin-bottom:14px"></h1>
+  <div class="hero">
+    <div class="heroin">
+      <div class="mwrap">
+        <svg class="mask" id="mask" viewBox="0 0 100 100" role="img" aria-label="Peil">
+          <g class="mini" id="mini">
+            <path d="M50 11 C51.6 18.6 53.4 20.4 61 22 C53.4 23.6 51.6 25.4 50 33 C48.4 25.4 46.6 23.6 39 22 C46.6 20.4 48.4 18.6 50 11 Z" fill="#C9963F" opacity=".8"/>
+          </g>
+          <path d="M50 20 C57 41 66 48 87 52 C66 56 57 63 50 84 C43 63 34 56 13 52 C34 48 43 41 50 20 Z" fill="#EDBE64"/>
+          <path d="M50 30 C54.6 44.6 60 48.8 74.6 52 C60 55.2 54.6 59.4 50 74 C45.4 59.4 40 55.2 25.4 52 C40 48.8 45.4 44.6 50 30 Z" fill="#F4D28C"/>
+          <circle cx="39.5" cy="52" r="3.2" fill="#E39272" opacity=".5" id="kinn1"/>
+          <circle cx="60.5" cy="52" r="3.2" fill="#E39272" opacity=".5" id="kinn2"/>
+          <circle cx="44.8" cy="49" r="3.4" fill="#2F4A52" id="oye1"/>
+          <circle cx="55.2" cy="49" r="3.4" fill="#2F4A52" id="oye2"/>
+          <circle cx="46" cy="47.9" r="1.15" fill="#FFFFFF"/>
+          <circle cx="56.4" cy="47.9" r="1.15" fill="#FFFFFF"/>
+          <path id="munn" d="M46.4 57 Q50 60.4 53.6 57" stroke="#2F4A52" stroke-width="1.9" fill="none" stroke-linecap="round"/>
+          <circle cx="16" cy="24" r="2.4" fill="#C9963F" class="glimt" id="g1"/>
+          <circle cx="84" cy="20" r="2.8" fill="#7E8E80" class="glimt" id="g2"/>
+          <circle cx="87" cy="72" r="2.2" fill="#C9963F" class="glimt" id="g3"/>
+          <circle cx="13" cy="70" r="2" fill="#7E8E80" class="glimt" id="g4"/>
+        </svg>
+      </div>
+      <div style="flex:1"><p class="hvem">Peil</p><p class="sier" id="sier"></p></div>
+    </div>
+    <div class="inn" id="inn">
+      <label for="svar">Ditt svar</label>
+      <div class="felt"><input id="svar" autocomplete="off" placeholder="…"><button class="hoved" id="send">Svar</button></div>
+      <p class="mld" id="mld"></p>
+
+      <div class="stige">
+        <div class="hjelperad">
+          <button class="hjelpknapp" id="hjelp">Jeg står fast</button>
+          <span class="nivaa" id="nivaa"></span>
+        </div>
+        <div class="gitt" id="gitt"></div>
+      </div>
+
+      <div class="opplast">
+        <p class="ol">Står oppgaven i boka? Vis den til Peil.</p>
+        <div class="olrad">
+          <button class="olknapp" id="btnKamera">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.2"/></svg>
+            Ta bilde
+          </button>
+          <button class="olknapp" id="btnFil">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 16V5M8 9l4-4 4 4M4 18v2h16v-2"/></svg>
+            Last opp bilde
+          </button>
+        </div>
+        <input type="file" id="filKamera" accept="image/*" capture="environment">
+        <input type="file" id="filVelg" accept="image/*">
+        <div class="forhaand" id="forhaand">
+          <img id="bilde" alt="Oppgaven du lastet opp">
+          <div class="bt"><span class="bs" id="bildestatus"></span><button class="fjern" id="fjernBilde">Fjern bildet</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="spor">
+    <h2>Sporet ditt</h2>
+    <p class="u">Slik tenkte du deg fram.</p>
+    <div class="sti" id="sti"><div class="stifyll" id="fyll"></div></div>
+  </div>
+  <div class="slutt" id="slutt">
+    <p class="h">Du kom fram til det selv</p>
+    <p>Peil ga deg aldri svaret.</p>
+    <div class="sluttknapper"><button class="hoved" id="tilbakeEmne">Fortsett</button></div>
+  </div>
+</section>
+
+<section class="skjerm" id="s8">
+  <button class="tilbake" id="tb8">← Avbryt testen</button>
+  <h1 id="t8tittel" style="font-size:21px">Test</h1>
+  <p class="u">Ingen hint her. Nå er det du som viser hva du kan.</p>
+  <div class="tprog" id="tprog"></div>
+  <div class="tkort" id="tkort">
+    <p class="tq" id="tq"></p>
+    <div id="talt"></div>
+    <div class="forkl" id="tforkl"></div>
+    <button class="hoved full" id="tneste" style="display:none;margin-top:14px">Neste</button>
+  </div>
+  <div id="tfasit"></div>
+</section>
+
+<section class="skjerm" id="s9">
+  <h1>Kjøreturen</h1>
+  <p class="u">Kjør så langt du klarer. Hver hindring er et spørsmål — svarer du riktig, kommer du forbi.</p>
+  <div id="spillMeny">
+    <h2>Fag</h2>
+    <div class="fagnett" id="spillFag"></div>
+    <h2>Vanskegrad</h2>
+    <div class="gradrad" id="spillGrad"></div>
+    <p class="merknad" style="margin-top:16px">Kjøreturen påvirker ikke himmelen din. Stjerner får du bare ved å bestå en ordentlig test.</p>
+    <button class="hoved full" id="startSpill">Start kjøreturen</button>
+  </div>
+  <div id="spillFlate" style="display:none">
+    <div class="hud">
+      <span class="hudv" id="liv">♦♦♦</span>
+      <span class="hudv">Avstand <b id="dist">0</b> m</span>
+      <span class="hudv">Riktige <b id="poeng">0</b></span>
+      <span class="hudv"><b id="kmt">0</b> km/t</span>
+      <span class="hudv"><b id="kmt">0</b> km/t</span>
+    </div>
+    <div class="vei" id="vei">
+      <div class="kant" style="left:0"></div>
+      <div class="stripe" id="str1"></div>
+      <div class="stripe" id="str2"></div>
+      <div class="stripe" id="str3"></div>
+      <div class="kant" style="right:0"></div>
+      <div class="sirene" id="sirene"></div>
+      <div id="hindre"></div>
+      <div class="kombo" id="kombo"></div>
+      <div class="politi" id="politi">
+        <svg viewBox="0 0 60 100" aria-label="politibil">
+          <rect x="9" y="16" width="42" height="72" rx="13" fill="#F2F2F0"/>
+          <rect x="9" y="40" width="42" height="16" fill="#2F4A52"/>
+          <rect x="14" y="24" width="32" height="18" rx="7" fill="#22383F"/>
+          <rect x="14" y="60" width="32" height="15" rx="6" fill="#22383F" opacity=".7"/>
+          <rect x="2" y="28" width="8" height="19" rx="3.5" fill="#25343A"/>
+          <rect x="50" y="28" width="8" height="19" rx="3.5" fill="#25343A"/>
+          <rect x="2" y="61" width="8" height="19" rx="3.5" fill="#25343A"/>
+          <rect x="50" y="61" width="8" height="19" rx="3.5" fill="#25343A"/>
+          <rect x="17" y="10" width="11" height="7" rx="3" fill="#3B7BE0" class="lys1"/>
+          <rect x="32" y="10" width="11" height="7" rx="3" fill="#D94A3D" class="lys2"/>
+        </svg>
+      </div>
+      <div class="politi" id="politi">
+        <svg viewBox="0 0 60 100" aria-label="politibil">
+          <rect x="9" y="16" width="42" height="72" rx="13" fill="#F2F2F0"/>
+          <rect x="9" y="40" width="42" height="20" fill="#2F4A52"/>
+          <rect x="14" y="24" width="32" height="18" rx="7" fill="#22383F"/>
+          <rect x="14" y="60" width="32" height="15" rx="6" fill="#22383F" opacity=".7"/>
+          <rect x="2" y="28" width="8" height="19" rx="3.5" fill="#25343A"/>
+          <rect x="50" y="28" width="8" height="19" rx="3.5" fill="#25343A"/>
+          <rect x="2" y="61" width="8" height="19" rx="3.5" fill="#25343A"/>
+          <rect x="50" y="61" width="8" height="19" rx="3.5" fill="#25343A"/>
+          <rect x="18" y="10" width="24" height="7" rx="3.5" class="blaalys"/>
+          <circle cx="20" cy="21" r="3.2" fill="#FFF6E0"/><circle cx="40" cy="21" r="3.2" fill="#FFF6E0"/>
+        </svg>
+      </div>
+      <div class="bil" id="bil">
+        <svg viewBox="0 0 60 100" aria-label="bil">
+          <rect x="9" y="16" width="42" height="72" rx="13" fill="#C9963F"/>
+          <path d="M9 40 h42 v8 h-42 z" fill="#B0802F" opacity=".5"/>
+          <rect x="14" y="24" width="32" height="18" rx="7" fill="#22383F"/>
+          <rect x="14" y="60" width="32" height="15" rx="6" fill="#22383F" opacity=".7"/>
+          <rect x="2" y="28" width="8" height="19" rx="3.5" fill="#25343A"/>
+          <rect x="50" y="28" width="8" height="19" rx="3.5" fill="#25343A"/>
+          <rect x="2" y="61" width="8" height="19" rx="3.5" fill="#25343A"/>
+          <rect x="50" y="61" width="8" height="19" rx="3.5" fill="#25343A"/>
+          <circle cx="20" cy="21" r="3.2" fill="#FFF6E0"/><circle cx="40" cy="21" r="3.2" fill="#FFF6E0"/>
+          <rect x="17" y="84" width="8" height="4" rx="2" fill="#B4705A"/>
+          <rect x="35" y="84" width="8" height="4" rx="2" fill="#B4705A"/>
+        </svg>
+      </div>
+    </div>
+    <p class="styr">Piltaster eller A og D — eller trykk på venstre og høyre side av veien.</p>
+    <div class="sporsmal" id="spm">
+      <p class="sqemne" id="sqEmne"></p>
+      <p class="sq" id="sqTekst"></p>
+      <div id="sqAlt"></div>
+      <div class="tidsbar" id="tidsbar"><span id="tidsfyll"></span></div>
+    </div>
+    <div id="spillSlutt"></div>
+  </div>
+</section>
+
+<section class="skjerm" id="s4">
+  <h1>Himmelen din</h1>
+  <p class="u">Hver regel du finner ut selv blir en stjerne. Trykk på en for å lese den igjen.</p>
+  <div class="himmel" id="himmel"></div>
+  <div class="valgtstjerne" id="valgtstjerne"></div>
+  <div class="hstat">
+    <div class="hs"><p class="n" id="hsStjerner">0</p><p class="l">stjerner</p></div>
+    <div class="hs"><p class="n" id="teller">0</p><p class="l">oppgaver løst selv</p></div>
+  </div>
+  <div id="bokliste"></div>
+</section>
+
+<section class="skjerm" id="s10">
+  <h1>Konto</h1>
+  <p class="u">Abonnement, betaling og data.</p>
+  <div id="kontoInnhold"></div>
+</section>
+
+<section class="skjerm" id="s5">
+  <h1>Læreplan</h1>
+  <p class="u">Kompetansemålene hentes fra Utdanningsdirektoratets åpne API.</p>
+  <div id="lpliste"></div>
+  <div class="lpinfo">
+    <h3>Slik holdes innholdet oppdatert</h3>
+    <ol>
+      <li>Hver natt spør Peil <code>data.udir.no</code> om gjeldende læreplan per fag.</li>
+      <li>Ny versjon lagres ved siden av den gamle, aldri oppå.</li>
+      <li>Endrede mål flagges, så innholdet under dem kan gjennomgås.</li>
+      <li>Ny læreplan slås på 1. august. Aldri midt i et skoleår.</li>
+    </ol>
+  </div>
+</section>
+
+</div>
+
+<nav class="nav">
+  <button class="nb on" data-mal="s1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5"/></svg>Velg</button>
+  <button class="nb" data-mal="s2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 20v-5M6 9V4M18 20v-9M18 6V4"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="8.5" r="2.5"/></svg>Ruta</button>
+  <button class="nb" data-mal="s4"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 C12.9 8.4 13.6 9.1 19 10 C13.6 10.9 12.9 11.6 12 17 C11.1 11.6 10.4 10.9 5 10 C10.4 9.1 11.1 8.4 12 3 Z"/><path d="M17.5 16 C17.9 18.2 18.1 18.4 20.3 18.8 C18.1 19.2 17.9 19.4 17.5 21.6 C17.1 19.4 16.9 19.2 14.7 18.8 C16.9 18.4 17.1 18.2 17.5 16 Z"/></svg>Himmelen</button>
+  <button class="nb" data-mal="s9"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 16v-4l2-5h10l2 5v4"/><path d="M5 16h14v3h-3v-3M5 16v3h3v-3"/><path d="M8 12h8"/></svg>Kjør</button>
+  <button class="nb" data-mal="s5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Læreplan</button>
+</nav>
+
+<script>
+const LAEREPLAN={
+ mat:{kode:"MAT01-06",navn:"Matematikk 1.–10. trinn",fra:"2026-08-01",fastsatt:"8. juni 2026",struktur:"per trinn",maal:31,klar:true},
+ nat:{kode:"NAT01-05",navn:"Naturfag",fra:"2026-08-01",fastsatt:"20. mai 2026",struktur:"etter 10. trinn",maal:23,klar:true},
+ nor:{kode:"NOR01-08",navn:"Norsk",fra:"2026-08-01",fastsatt:"juni 2026",struktur:"etter 10. trinn",maal:16,klar:true},
+ eng:{kode:"ENG01-06",navn:"Engelsk",fra:"2026-08-01",fastsatt:"juni 2026",struktur:"etter 10. trinn",maal:19,klar:true},
+ spr:{kode:"FSP01-04",navn:"Fremmedspråk nivå I",fra:"2026-08-01",fastsatt:"juni 2026",struktur:"felles for alle språk",maal:"–",klar:true},
+ sam:{kode:"ikke hentet",navn:"Samfunnsfag",fra:"—",fastsatt:"—",struktur:"etter 10. trinn",maal:"–",klar:false},
+ krle:{kode:"ikke hentet",navn:"KRLE",fra:"—",fastsatt:"—",struktur:"etter 10. trinn",maal:"–",klar:false}
+};
+const FAG=[
+ {id:"mat",n:"Matematikk",s:"Klar",f:"#2F4A52",klar:true},
+ {id:"nat",n:"Naturfag",s:"Klar",f:"#7E8E80",klar:true},
+ {id:"nor",n:"Norsk",s:"Klar",f:"#C9963F",klar:true},
+ {id:"eng",n:"Engelsk",s:"Klar",f:"#B4705A",klar:true},
+ {id:"sam",n:"Samfunnsfag",s:"Kommer",f:"#5E7365",klar:false},
+ {id:"krle",n:"KRLE",s:"Kommer",f:"#8FA3A7",klar:false},
+ {id:"spr",n:"Fremmedspråk",s:"Klar",f:"#9B7BB8",klar:true}
+];
+
+const EMNE={
+ retorikk:{
+  n:"Retoriske appellformer",
+  m:"gjenkjenne og bruke språklige virkemidler og retoriske appellformer",
+  regel:"Etos handler om troverdighet, patos om følelser og logos om fornuft.",
+  laer:[
+   {h:"Hva retorikk er",p:"Retorikk er læren om hvordan vi overbeviser andre. Når noen prøver å få deg til å mene noe, bruker de nesten alltid en av tre virkemåter. Kjenner du dem igjen, blir du mye vanskeligere å lure.",eks:"Reklame, taler, avisinnlegg og TikTok-videoer bruker alle retorikk."},
+   {h:"Etos — troverdighet",p:"Avsenderen viser at hun er verdt å stole på. Det gjøres ved å vise til utdanning, erfaring eller egne opplevelser.",eks:"«Som tannlege gjennom 20 år anbefaler jeg …»"},
+   {h:"Patos — følelser",p:"Teksten spiller på følelsene dine. Den vil gjøre deg trist, sint, redd eller rørt, slik at du blir engasjert.",eks:"«Tenk på barna som ikke har noe å spise i kveld.»"},
+   {h:"Logos — fornuft",p:"Argumentet bygger på fakta, tall og logikk. Du skal overbevises av at det henger sammen, ikke av hvem som sier det eller hvordan du føler deg.",eks:"«Tre av fire elever sier de sover bedre uten mobil på rommet.»"},
+   {h:"Den vanligste fellen",p:"Mange tror en tekst bare bruker én appellform. De fleste gode tekster bruker flere samtidig, og det er nettopp derfor de virker.",adv:"Spør heller hvilken appellform som er sterkest her, enn hvilken som er den eneste."}
+  ],
+  ov:[
+   {t:"Oppvarming · Kjenn dem igjen",niva:"start",steg:[
+    {q:"«Som lege med 20 års erfaring mener jeg dette er trygt.» Hvilken appellform er sterkest?",enkel:"«Som lege med 20 års erfaring mener jeg dette er trygt.» Er dette etos, patos eller logos?",kort:"Fant etos",fasit:["etos","ethos"],
+     hint:"Hvorfor nevner hun at hun er lege?",om:"Handler det om følelser, fakta eller om hvem som snakker?",naer:"Se på hva avsenderen sier om seg selv.",lign:"«Jeg har vært lærer i 30 år.» Hvilken appellform?"},
+    {q:"«Ni av ti elever fikk bedre karakterer.» Hvilken appellform er dette?",enkel:"«Ni av ti elever fikk bedre karakterer.» Er dette etos, patos eller logos?",kort:"Fant logos",fasit:["logos"],
+     hint:"Setningen inneholder et tall. Hva appellerer tall til?",om:"Blir du rørt, eller overbevist av fakta?",naer:"Tenk på fornuft og tall.",lign:"«Forskning viser at søvn øker læring.»"}]},
+   {t:"Øving 1 · Finn virkemiddelet",steg:[
+    {q:"«Tenk på alle barna som legger seg sultne i kveld.» Hvilken appellform er sterkest?",kort:"Fant patos",fasit:["patos","pathos"],
+     hint:"Hva føler du når du leser setningen?",om:"Teksten vil at du skal bli berørt.",naer:"Det er ikke tall eller autoritet her.",lign:"«Familien mistet alt de eide på én natt.»"},
+    {q:"Hvorfor virker patos så godt i innsamlingsaksjoner?",kort:"Forklarte effekten",fasit:["følelse","føler","berør","engasjer","handl"],
+     hint:"Hva får folk til å faktisk gjøre noe — tall eller følelser?",om:"Tenk på forskjellen mellom å vite og å bry seg.",naer:"Du er nær. Hva er det patos gjør med leseren?",lign:"Hvorfor bruker reklame ofte glade familier?"}]},
+   {t:"Øving 2 · Flere samtidig",steg:[
+    {q:"«Som forsker har jeg sett tallene, og de er skremmende: halvparten av ungdommer sover for lite.» Hvor mange appellformer er i bruk?",kort:"Så sammensetningen",fasit:["3","tre","alle"],
+     hint:"Se etter yrke, tall og et ord som vekker følelser.",om:"«Som forsker», «halvparten», «skremmende».",naer:"Tell én gang til — det er flere enn to.",lign:"Finn appellformene i en reklame du husker."},
+    {q:"Hvilket ord i setningen bærer patos?",kort:"Pekte på ordet",fasit:["skremmende","skremmand"],
+     hint:"Hvilket ord er ment å gi deg en følelse?",om:"Ett av ordene beskriver ikke fakta, men en reaksjon.",naer:"Se på adjektivet.",lign:"Hvilket ord bærer patos i «en tragisk utvikling»?"}]},
+   {t:"Utfordring · Bruk det selv",niva:"utfordring",steg:[
+    {q:"Du skal overbevise rektor om senere skolestart. Hvilken appellform bør bære argumentet ditt?",kort:"Valgte strategi",fasit:["logos"],
+     hint:"Hva overbeviser en rektor mest — tall og forskning, eller følelser?",om:"Tenk på hvem mottakeren er.",naer:"Til en formell mottaker velger du sjelden patos alene.",lign:"Hva ville du valgt overfor en klassekamerat?"},
+    {q:"Hvorfor bør du likevel ha litt etos med?",kort:"Så helheten",fasit:["troverdig","tillit","stole","seriøs"],
+     hint:"Hvorfor skal rektor høre på akkurat deg?",om:"Hva gjør at et argument blir tatt på alvor?",naer:"Det handler om hvordan du framstår.",lign:"Hvordan bygger du etos som elev?"}]}
+  ],
+  test:[
+   {q:"Hva betyr etos?",alt:["Å spille på følelser","Å vise til fornuft og fakta","Avsenderens troverdighet","En type sjanger"],r:2,f:"Etos handler om hvorfor vi skal stole på avsenderen — erfaring, yrke eller egne opplevelser."},
+   {q:"«Åtte av ti sier de sover bedre uten mobil.» Hvilken appellform?",alt:["Etos","Patos","Logos","Ingen"],r:2,f:"Tall og statistikk appellerer til fornuften. Det er logos."},
+   {q:"Hvilken setning bruker patos sterkest?",alt:["Rapporten er 40 sider lang","Ingen barn burde måtte gå sultne til sengs","Undersøkelsen ble gjort i 2025","Jeg er utdannet sykepleier"],r:1,f:"Setningen er ment å vekke medfølelse. Den gir verken fakta eller viser til avsenderens bakgrunn."},
+   {q:"En tekst bruker både tall, en personlig historie og forfatterens yrkestittel. Hva stemmer?",alt:["Den bruker bare logos","Den bruker alle tre appellformene","Den bruker bare etos","Retorikk krever at man velger én"],r:1,f:"Tall er logos, den personlige historien er patos og yrkestittelen er etos. Gode tekster kombinerer ofte alle tre."},
+   {q:"Hvorfor er det nyttig å kjenne appellformene?",alt:["For å skrive lengre tekster","For å gjennomskue hvordan andre prøver å påvirke deg","For å lære nynorsk","For å telle setninger"],r:1,f:"Kjenner du virkemidlene, ser du hva en tekst prøver å gjøre med deg — og du kan bruke dem bevisst selv."}
+  ]},
+ pot:{
+  n:"Potenser og kvadratrøtter",
+  m:"regne med potenser og kvadratrøtter og forklare framgangsmåter og resultater",
+  regel:"Ganger jeg potenser med samme grunntall, legger jeg sammen eksponentene.",
+  laer:[
+   {h:"Hva en potens er",p:"En potens er en kort måte å skrive gjentatt multiplikasjon på. Tallet nederst kalles grunntallet, og tallet oppe til høyre kalles eksponenten. Eksponenten sier hvor mange ganger grunntallet skal ganges med seg selv.",eks:"2⁴ = 2 · 2 · 2 · 2 = 16"},
+   {h:"Den vanligste fellen",p:"Mange leser 2³ som «2 ganger 3» og svarer 6. Det er feil. Eksponenten er ikke en faktor, den er et antall.",adv:"2³ er ikke 6. Det er 2 · 2 · 2 = 8."},
+   {h:"Samme grunntall",p:"Når du ganger to potenser som har samme grunntall, kan du legge sammen eksponentene i stedet for å regne alt ut. Skriver du potensene helt ut, ser du hvorfor: du teller rett og slett hvor mange faktorer det er til sammen.",eks:"2² · 2³ = (2·2) · (2·2·2) = 2⁵"},
+   {h:"Når regelen ikke gjelder",p:"Regelen krever at grunntallene er like. 2³ · 5³ kan du ikke slå sammen på denne måten, fordi det er to forskjellige tall som ganges.",adv:"Sjekk alltid grunntallene før du bruker regelen."},
+   {h:"Kvadratrot",p:"Kvadratrota gjør det motsatte av å opphøye i andre. √49 er 7, fordi 7 · 7 = 49. Rot og kvadrering opphever hverandre.",eks:"√64 = 8 fordi 8 · 8 = 64"}
+  ],
+  ov:[
+   {t:"Oppvarming · Bli kjent med potenser",niva:"start",steg:[
+    {q:"Først det helt grunnleggende. Hva er <b>2 · 2</b>?",enkel:"Vi starter enkelt. Hva er <b>2 · 2</b>?",kort:"Ganget to toere",fasit:["4","fire"],
+     hint:"To toere ganget sammen.",om:"Tenk på to par.",naer:"Prøv igjen, helt rolig.",lign:"Hva er 3 · 3?"},
+    {q:"Bra. <b>2 · 2</b> kan skrives som 2². Hva blir da <b>2 · 2 · 2</b> skrevet som potens?",enkel:"Bra! <b>2 · 2</b> skriver vi som 2². Hvor mange toere er det i 2³?",kort:"Forsto skrivemåten",fasit:["2^3","2³","2 opphøyd i 3","3","tre"],
+     hint:"Tell hvor mange toere som ganges. Det tallet står oppe til høyre.",om:"Antall toere blir eksponenten.",naer:"Se på hvor mange toere det er.",lign:"Hvordan skriver du 5 · 5 · 5 · 5?"}]},
+   {t:"Øving 1 · Finn mønsteret",steg:[
+    {q:"Skriv <b>2² · 2³</b> helt ut som ganging. Hvor mange toere blir det?",kort:"Talte faktorene",fasit:["5","fem"],laerRef:2,
+     feilsvar:{"6":"Du fikk 6, og da har du nok ganget 2 med 3. Men eksponenten sier ikke hvor mye du skal gange med — den sier hvor mange faktorer det er.","4":"4 er antallet du får hvis du bare ser på én av potensene. Husk at det er to potenser her som ganges sammen.","32":"32 er hva uttrykket blir til slutt. Spørsmålet var hvor mange toere det er, ikke hva svaret blir."},
+     hint:"2² er to toere. 2³ er tre toere. Legg dem sammen.",om:"Tell antall 2-er i hele uttrykket.",naer:"Nesten. Tell én gang til, rolig.",lign:"Hvor mange treere er det i 3² · 3⁴?"},
+    {q:"Så <b>2² · 2³ = 2⁵</b>. Hva gjorde du med eksponentene?",kort:"Fant regelen",fasit:["la","adder","pluss","sammen","summ"],
+     hint:"Du hadde 2 og 3, og endte med 5. Hvilken regneart?",om:"Ganget du dem, eller la du dem sammen?",naer:"Se på tallene 2, 3 og 5. Hva skjedde?",lign:"Hva blir 7³ · 7² som én potens?"}]},
+   {t:"Øving 2 · Test grensen",steg:[
+    {q:"Gjelder samme regel for <b>2³ · 5³</b>? Svar ja eller nei.",kort:"Testet grunntallene",fasit:["nei","ikke"],
+     hint:"Er grunntallene like her?",om:"Regelen krever noe av grunntallene. Hva?",naer:"Sammenlign grunntallene, ikke eksponentene.",lign:"Gjelder regelen for 4² · 4⁵?"},
+    {q:"Riktig. Hva er det som <b>må</b> være likt for at regelen skal virke?",kort:"Formulerte vilkåret",fasit:["grunntall","grunn tall","basen"],
+     hint:"Hvilket av de to tallene i en potens snakker vi om?",om:"Det tallet som står nederst og stort.",naer:"Ikke eksponenten. Det andre tallet.",lign:"Hva heter tallet oppe til høyre?"}]},
+   {t:"Øving 3 · Bruk det i praksis",steg:[
+    {q:"En bakterie deler seg hver time. Etter 3 timer er det <b>2³</b>. Hvor mange er det?",kort:"Regnet ut potens",fasit:["8","åtte","atte"],
+     hint:"2 · 2 · 2. Regn steg for steg.",om:"1 blir 2, 2 blir 4, 4 blir …?",naer:"Nesten. Husk at det er ganging, ikke plussing.",lign:"Hvor mange etter 4 timer?"},
+    {q:"Etter <b>3 timer til</b> har det gått 6 timer totalt. Skriv antallet som én potens.",kort:"Brukte regelen",fasit:["2^6","2⁶","2 opphøyd i 6","to opphøyd i seks"],
+     hint:"Du har 2³ · 2³. Legg sammen eksponentene.",om:"Tre timer pluss tre timer til.",naer:"Skriv det som 2 opphøyd i noe.",lign:"Hva blir det etter 10 timer?"},
+    {q:"Siste: en kvadratisk plass har areal <b>64 m²</b>. Hvor lang er hver side?",kort:"Tok kvadratrota",fasit:["8","åtte","atte"],
+     hint:"Hvilket tall ganget med seg selv gir 64?",om:"Areal av kvadrat er side ganger side.",naer:"Ikke del på 2. Ta kvadratrota.",lign:"Hva om arealet var 100 m²?"}]},
+   {t:"Ekstra øving · Én gang til, rolig",niva:"ekstra",steg:[
+    {q:"Vi tar det helt rolig. Hvor mange treere er det i <b>3² · 3²</b>?",kort:"Talte på nytt",fasit:["4","fire"],
+     hint:"3² er to treere. Du har to slike grupper.",om:"Skriv det ut: 3·3·3·3.",naer:"Tell én gang til.",lign:"Hvor mange i 4² · 4²?"},
+    {q:"Riktig. Skriv <b>3² · 3²</b> som én potens.",kort:"Brukte regelen",fasit:["3^4","3⁴","3 opphøyd i 4"],
+     hint:"Legg sammen eksponentene: 2 + 2.",om:"Fire treere ganget sammen.",naer:"Grunntallet er fortsatt 3.",lign:"Hva blir 5² · 5³?"}]},
+   {t:"Utfordring · For deg som har skjønt det",niva:"utfordring",steg:[
+    {q:"Hva blir <b>(2³)²</b>? Tenk nøye — det er en potens av en potens.",kort:"Løste dobbel potens",fasit:["64","2^6","2⁶"],
+     hint:"2³ er 8. Hva er 8²?",om:"Du har tre toere, to ganger. Hvor mange toere totalt?",naer:"Ikke legg sammen her — tell faktorene.",lign:"Hva blir (3²)²?"},
+    {q:"Så <b>(2³)² = 2⁶</b>. Hva gjorde du med eksponentene 3 og 2?",kort:"Fant den nye regelen",fasit:["ganget","multipl","gange"],
+     hint:"Du hadde 3 og 2, og endte med 6.",om:"Ikke pluss denne gangen.",naer:"3 og 2 ble til 6. Hvilken regneart?",lign:"Hva blir (5⁴)³?"}]}
+  ],
+  test:[
+   {q:"Hva er 3⁴?",alt:["12","81","64","7"],r:1,f:"3⁴ betyr 3·3·3·3. 3·3=9, 9·3=27, 27·3=81."},
+   {q:"Skriv 5³ · 5² som én potens.",alt:["5⁶","25⁵","5⁵","10⁵"],r:2,f:"Samme grunntall, så eksponentene legges sammen: 3 + 2 = 5."},
+   {q:"Kan du bruke regelen på 3² · 7²?",alt:["Ja, det blir 21²","Ja, det blir 3⁴","Nei, grunntallene er ulike","Nei, eksponentene er like"],r:2,f:"Regelen krever samme grunntall. Her er grunntallene 3 og 7, altså ulike."},
+   {q:"Hva er √81?",alt:["9","40,5","8","18"],r:0,f:"9 · 9 = 81, så kvadratrota av 81 er 9. Å ta rota er ikke det samme som å dele på 2."},
+   {q:"En elev skriver 4³ = 12. Hva er feilen?",alt:["Hun glemte å ta rota","Hun ganget grunntallet med eksponenten","Hun la sammen i stedet for å gange","Ingenting, 12 er riktig"],r:1,f:"4³ betyr 4·4·4 = 64. Eleven regnet 4·3, som er den vanligste fellen med potenser."}
+  ]},
+
+ brok:{
+  n:"Faktorisering og brøk",
+  m:"beskrive og utforske faktorisering og primtallsfaktorisering og bruke det i brøkregning",
+  regel:"Ganger jeg med en brøk mindre enn 1, blir svaret mindre.",
+  laer:[
+   {h:"Primtall",p:"Et primtall kan bare deles på 1 og seg selv. 2, 3, 5, 7, 11 og 13 er primtall. Tallet 1 er ikke et primtall, fordi det bare har én faktor.",eks:"7 er et primtall. 9 er det ikke, siden 9 = 3 · 3."},
+   {h:"Primtallsfaktorisering",p:"Alle hele tall større enn 1 kan skrives som et produkt av primtall. Du finner dem ved å dele på det minste primtallet som går opp, om og om igjen, til du står igjen med 1.",eks:"60 = 2 · 2 · 3 · 5"},
+   {h:"Derfor er det nyttig i brøk",p:"Når du faktoriserer teller og nevner, ser du med én gang hvilke faktorer som er felles. Da kan du stryke dem, og brøken er forkortet helt ned i ett steg i stedet for at du må gjette deg fram.",eks:"84/126 = (2·2·3·7)/(2·3·3·7) = 2/3"},
+   {h:"Den vanligste fellen",p:"Du kan bare stryke faktorer som er ganget sammen, aldri ledd som er lagt sammen.",adv:"I (3 + 4)/3 kan du ikke stryke treerne. Der er 3 og 4 lagt sammen, ikke ganget."},
+   {h:"Å gange med brøk",p:"Når du ganger et tall med en brøk, tar du først én del og ganger deretter opp med telleren. Er brøken mindre enn 1, blir svaret mindre enn det du startet med. Er den større enn 1, blir svaret større.",eks:"8 · 3/4: én firedel er 2, tre firedeler er 6"}
+  ],
+  ov:[
+   {t:"Oppvarming · Halvparten først",niva:"start",steg:[
+    {q:"Vi starter helt enkelt. Hva er <b>halvparten</b> av 8?",enkel:"Vi starter enkelt. Hva er halvparten av 8?",kort:"Fant halvparten",fasit:["4","fire"],
+     hint:"Del 8 i to like store deler.",om:"Åtte kaker delt på to personer.",naer:"Prøv én gang til.",lign:"Hva er halvparten av 10?"},
+    {q:"Halvparten skriver vi som <b>1/2</b>. Ble svaret større eller mindre enn 8?",enkel:"Halvparten skriver vi som 1/2. Ble svaret større eller mindre enn 8?",kort:"Så retningen",fasit:["mindre","minder"],
+     hint:"4 mot 8 — hvilken er størst?",om:"Tar du halvparten, får du ikke mer enn du hadde.",naer:"Sammenlign 4 og 8.",lign:"Hva med en tredel av 9?"}]},
+   {t:"Øving 1 · Del opp tallet",steg:[
+    {q:"Vi starter enkelt. Hva er <b>1/4</b> av 8?",kort:"Fant 1/4 av 8",fasit:["2","to"],
+     hint:"Del 8 i fire like store deler. Hvor mange i hver?",om:"Åtte pizzastykker delt likt på fire.",naer:"Nesten. Sjekk hvor mange deler vi deler i.",lign:"Hva er 1/4 av 12?"},
+    {q:"Bra. Men vi skal ha <b>tre</b> firedeler. Hvor mye blir det?",kort:"Ganget opp til 3/4",fasit:["6","seks"],laerRef:4,
+     feilsvar:{"2":"2 var svaret på forrige spørsmål — det er én firedel. Nå skal vi ha tre av dem.","8":"8 er tallet vi startet med. Tre firedeler må bli mindre enn det hele.","5":"Det ser ut som du la sammen 2 og 3. Her skal du gange: tre stykker som hver er 2.","12":"12 er det du får hvis du ganger 4 med 3. Men firedelen var 2, ikke 4."},
+     hint:"Én firedel var 2. Hva blir tre slike?",om:"Du har 2, tre ganger.",naer:"Ikke helt. Du fant én firedel — nå trenger vi tre.",lign:"Hvis 1/5 av 20 er 4, hva blir 3/5 av 20?"},
+    {q:"Nå det viktigste: hvorfor ble svaret mindre enn 8?",kort:"Forklarte hvorfor",fasit:["mindre enn 1","under 1","mindre enn en","mindre en 1"],
+     hint:"Sammenlign 3/4 med tallet 1. Hvilken er størst?",om:"Ganger du med 2 blir det større. Hva med 3/4?",naer:"Du er på sporet. Hvordan er 3/4 i forhold til 1?",lign:"Hva skjer hvis du ganger 8 med 5/4?"}]},
+   {t:"Øving 2 · Faktoriser og forkort",steg:[
+    {q:"Primtallsfaktoriser <b>24</b>. Hvor mange toere inngår?",kort:"Fant faktorene i 24",fasit:["3","tre"],
+     hint:"24 : 2 = 12, 12 : 2 = 6, 6 : 2 = 3. Hvor mange ganger delte du på 2?",om:"Del på 2 så lenge det går opp.",naer:"Tell hvor mange ganger 2 går opp.",lign:"Hvor mange toere er det i 40?"},
+    {q:"Så <b>24 = 2·2·2·3</b>. Forkort <b>24/36</b> helt. Hva blir telleren?",kort:"Forkortet brøken",fasit:["2","to"],
+     hint:"36 = 2·2·3·3. Hvilke faktorer er felles?",om:"Stryk det som står i begge, og se hva som er igjen øverst.",naer:"Nesten. Sjekk om du kan forkorte videre.",lign:"Forkort 18/24."}]},
+   {t:"Ekstra øving · Én gang til, rolig",niva:"ekstra",steg:[
+    {q:"Rolig nå. Hva er <b>1/3</b> av 9?",kort:"Fant én tredel",fasit:["3","tre"],
+     hint:"Del 9 i tre like store deler.",om:"Ni kuler fordelt på tre bokser.",naer:"Tell én gang til.",lign:"Hva er 1/3 av 12?"},
+    {q:"Riktig. Hva blir da <b>2/3</b> av 9?",kort:"Ganget opp",fasit:["6","seks"],
+     hint:"Én tredel var 3. Du skal ha to av dem.",om:"3 to ganger.",naer:"Du fant én tredel. Nå trenger vi to.",lign:"Hva blir 2/3 av 12?"}]},
+   {t:"Utfordring · For deg som har skjønt det",niva:"utfordring",steg:[
+    {q:"Hva er <b>2/3 av 3/4</b>? Svar som brøk.",kort:"Ganget to brøker",fasit:["1/2","2/4","6/12","0,5"],
+     hint:"Gang teller med teller og nevner med nevner: 2·3 og 3·4.",om:"Tegn et rektangel delt i fire, og ta to tredeler av tre av dem.",naer:"Gang rett fram, og forkort til slutt.",lign:"Hva er 1/2 av 2/5?"},
+    {q:"Begge brøkene var under 1. Hva sier det om svaret?",kort:"Generaliserte",fasit:["mindre","minder","minst"],
+     hint:"Sammenlign svaret med begge brøkene du startet med.",om:"Tar du en del av en del, blir det lite.",naer:"Ble svaret større eller mindre enn 3/4?",lign:"Hva om du ganget med 5/4 i stedet?"}]}
+  ],
+  test:[
+   {q:"Hvilket av disse er et primtall?",alt:["1","9","13","21"],r:2,f:"13 kan bare deles på 1 og 13. 1 er ikke et primtall, 9 = 3·3 og 21 = 3·7."},
+   {q:"Primtallsfaktoriser 60.",alt:["2·30","4·15","2·2·3·5","6·10"],r:2,f:"Alle faktorene må være primtall. 2·2·3·5 = 60, og alle fire er primtall."},
+   {q:"Forkort 84/126 så langt det går.",alt:["2/3","42/63","6/9","4/6"],r:0,f:"84 = 2·2·3·7 og 126 = 2·3·3·7. Felles faktorer er 2, 3 og 7. Igjen står 2/3."},
+   {q:"Hva er 20 · 2/5?",alt:["5","8","10","40"],r:1,f:"Én femdel av 20 er 4. To femdeler blir 4 · 2 = 8."},
+   {q:"Du ganger et tall med 7/4. Hva skjer med svaret?",alt:["Det blir mindre","Det blir større","Det blir likt","Det kommer an på tallet"],r:1,f:"7/4 er større enn 1, så svaret blir større enn tallet du startet med."}
+  ]},
+
+ lign:{
+  n:"Ligninger i praksis",
+  m:"lage og løse ligninger knyttet til praktiske situasjoner og kritisk vurdere løsninger",
+  regel:"Det jeg gjør på én side av likhetstegnet, må jeg gjøre på den andre også.",
+  laer:[
+   {h:"Likhetstegnet er en vekt",p:"En ligning sier at det som står på hver side av likhetstegnet er like mye verdt. Tenk på en skålvekt i balanse. Fjerner du noe fra den ene siden, må du fjerne like mye fra den andre, ellers tipper den.",eks:"3x + 7 = 22 betyr: 3x og 7 til sammen veier like mye som 22"},
+   {h:"Målet er å få x alene",p:"Du løser en ligning ved å fjerne alt som står rundt x, ett steg om gangen. Start med å fjerne tall som er lagt til eller trukket fra, og ta ganging og deling til slutt.",eks:"3x + 7 = 22 → 3x = 15 → x = 5"},
+   {h:"Den vanligste fellen",p:"Mange flytter et tall over likhetstegnet uten å snu fortegnet, eller endrer bare den ene siden.",adv:"Trekker du fra 7 til venstre, må du trekke fra 7 til høyre også."},
+   {h:"Sjekk alltid svaret",p:"Sett tallet du fant inn i den opprinnelige ligningen. Blir begge sider like, er svaret riktig. Dette tar ti sekunder og fanger nesten alle regnefeil.",eks:"x = 5: 3 · 5 + 7 = 22. Stemmer."},
+   {h:"Fra tekst til ligning",p:"I en tekstoppgave må du først bestemme hva x skal bety, og skrive det ned med ord. Deretter leter du etter setningen som sier at to ting er like store. Den blir likhetstegnet ditt.",eks:"La x = antall treningsganger. 250 + 40x = 570"}
+  ],
+  ov:[
+   {t:"Oppvarming · Hva står x for?",niva:"start",steg:[
+    {q:"Vi starter enkelt. Hvis <b>x + 4 = 10</b>, hva er x?",enkel:"Vi starter enkelt. Hvis x + 4 = 10, hvilket tall er x?",kort:"Fant x i hodet",fasit:["6","seks"],
+     hint:"Hvilket tall pluss 4 blir 10?",om:"Du har 10 kroner. Fire av dem er kjent. Hvor mange er x?",naer:"Prøv å telle deg fram.",lign:"Hva er x når x + 3 = 9?"},
+    {q:"Bra. Du trakk fra 4. Måtte du gjøre det på <b>begge</b> sider?",enkel:"Bra! Du trakk fra 4. Måtte du gjøre det på begge sider av likhetstegnet?",kort:"Forsto balansen",fasit:["ja"],
+     hint:"Tenk på en vekt som må holde seg i balanse.",om:"Fjerner du noe på én side, tipper vekta.",naer:"Hva skjer med en vekt hvis du bare tar fra den ene siden?",lign:"Hva om du bare hadde endret venstre side?"}]},
+   {t:"Øving 1 · Løs steg for steg",steg:[
+    {q:"Vi tar <b>3x + 7 = 22</b>. Hva må bort fra venstre side først?",kort:"Fjernet konstantleddet",fasit:["7","syv","sju"],
+     hint:"Hvilket tall står i veien for at 3x skal stå alene?",om:"Tenk på en vekt. Hva kan du løfte av?",naer:"Nesten — se på leddet som ikke har x i seg.",lign:"Hva må bort først i 5x + 2 = 17?"},
+    {q:"Riktig. Du trakk fra 7 til venstre. Hva blir høyre side da?",kort:"Holdt balansen",fasit:["15","femten"],
+     hint:"Det du gjør på én side, må du gjøre på den andre. 22 minus 7.",om:"Vekta må være i balanse hele tiden.",naer:"Husk at begge sider må behandles likt.",lign:"Hvis 4x + 3 = 19, hva blir høyre side når 3 fjernes?"},
+    {q:"Nå står det <b>3x = 15</b>. Hva er x?",kort:"Fant x",fasit:["5","fem"],laerRef:1,
+     feilsvar:{"12":"12 er 15 minus 3. Men 3 og x er ganget sammen her, ikke lagt sammen — da må du dele, ikke trekke fra.","45":"45 er 15 ganget med 3. Du gjorde det motsatte av det du skulle: for å fjerne en ganging, deler du.","18":"18 er 15 pluss 3. Se på hva som står mellom 3 og x — det er ingenting, og det betyr ganging."},
+     hint:"Tre like store deler utgjør 15. Hvor stor er én?",om:"3 ganger hva blir 15?",naer:"Ikke helt. Del begge sider på 3.",lign:"Hva er x når 4x = 28?"}]},
+   {t:"Øving 2 · Lag ligningen selv",steg:[
+    {q:"Et treningssenter tar 250 kr i måneden pluss 40 kr per gang. Hva bør <b>x</b> bety her?",kort:"Definerte variabelen",fasit:["gang","trening","besøk","ganger"],
+     hint:"Hva er det vi ikke vet, og som vi vil finne ut?",om:"Hvilket tall i oppgaven varierer?",naer:"Nesten. Det er ikke kronene som er ukjent.",lign:"Hva bør x bety hvis prisen er per time?"},
+    {q:"Du betalte <b>570 kr</b>. Hvor mange ganger trente du?",kort:"Løste ligningen",fasit:["8","åtte","atte"],
+     hint:"Sett opp 250 + 40x = 570, og trekk fra 250 på begge sider.",om:"Hvor mye av de 570 gikk til treningene?",naer:"Nesten. Husk å trekke fra månedsprisen først.",lign:"Hva om du betalte 650 kr?"}]},
+   {t:"Ekstra øving · Én gang til, rolig",niva:"ekstra",steg:[
+    {q:"Rolig nå. I <b>2x + 5 = 13</b>, hva må bort først?",kort:"Fant første steg",fasit:["5","fem"],
+     hint:"Hvilket tall står i veien for at 2x skal stå alene?",om:"Det leddet som ikke har x i seg.",naer:"Se på tallet uten x.",lign:"Hva må bort først i 3x + 4 = 19?"},
+    {q:"Riktig, nå står det <b>2x = 8</b>. Hva er x?",kort:"Fant x",fasit:["4","fire"],
+     hint:"To like deler utgjør 8.",om:"2 ganger hva blir 8?",naer:"Del begge sider på 2.",lign:"Hva er x når 5x = 20?"}]},
+   {t:"Utfordring · For deg som har skjønt det",niva:"utfordring",steg:[
+    {q:"Løs <b>3(x − 2) = 2x + 4</b>. Hva blir venstre side når parentesen ganges ut?",kort:"Ganget ut parentes",fasit:["3x-6","3x − 6","3x−6","3x minus 6"],
+     hint:"3 skal ganges med begge leddene inni parentesen.",om:"3 · x og 3 · (−2).",naer:"Husk å gange med begge ledd, også det negative.",lign:"Gang ut 4(x − 3)."},
+    {q:"Nå har du <b>3x − 6 = 2x + 4</b>. Hva er x?",kort:"Løste hele ligningen",fasit:["10","ti"],
+     hint:"Trekk fra 2x på begge sider, og legg til 6.",om:"Samle x til venstre og tall til høyre.",naer:"Nesten. Sjekk fortegnene når du flytter.",lign:"Løs 4x − 3 = 2x + 9."}]}
+  ],
+  test:[
+   {q:"Løs 5x − 3 = 17.",alt:["x = 2,8","x = 4","x = 14","x = 100"],r:1,f:"Legg til 3 på begge sider: 5x = 20. Del på 5: x = 4."},
+   {q:"Hvorfor må du gjøre det samme på begge sider?",alt:["Fordi det ser penere ut","For at ligningen skal holde seg i balanse","Fordi x alltid er positiv","Det må du ikke"],r:1,f:"Likhetstegnet betyr at sidene er like mye verdt. Endrer du bare den ene, er de ikke like lenger."},
+   {q:"En elev løser 2x + 6 = 14 og får x = 10. Hva gikk galt?",alt:["Hun delte på 2 for tidlig","Hun la til 6 i stedet for å trekke fra","Hun glemte å dele på 2","Ingenting, x = 10 er riktig"],r:1,f:"Riktig er 2x = 8, altså x = 4. Eleven la til 6 i stedet for å trekke fra."},
+   {q:"Et abonnement koster 99 kr fast pluss 15 kr per film. Hvilken ligning passer til 249 kr?",alt:["99x + 15 = 249","99 + 15x = 249","15 + 99 = 249x","114x = 249"],r:1,f:"99 er fast og betales uansett. 15 ganges med antall filmer, altså 15x."},
+   {q:"Løs 4x = 2x + 12.",alt:["x = 6","x = 2","x = 12","x = 3"],r:0,f:"Trekk fra 2x på begge sider: 2x = 12. Del på 2: x = 6."}
+  ]},
+
+ pyt:{
+  n:"Pytagoras' læresetning",
+  m:"bruke formlikhet og Pytagoras' læresetning til utforsking av praktiske situasjoner",
+  regel:"I en rettvinklet trekant er summen av kvadratene på katetene lik kvadratet på hypotenusen.",
+  laer:[
+   {h:"Navnene på sidene",p:"I en rettvinklet trekant kalles den lengste siden hypotenusen. Den ligger alltid rett overfor den rette vinkelen. De to andre sidene kalles kateter.",eks:"Kateter: de to korte sidene. Hypotenus: den lange."},
+   {h:"Selve setningen",p:"Setningen sier at hvis du lager et kvadrat på hver av de to katetene og legger arealene sammen, får du nøyaktig arealet av kvadratet på hypotenusen.",eks:"a² + b² = c², der c er hypotenusen"},
+   {h:"Slik regner du",p:"Skal du finne hypotenusen, regner du ut begge katetene i andre, legger sammen, og tar kvadratrota til slutt. Det siste steget glemmes ofte.",eks:"3² + 4² = 9 + 16 = 25, og √25 = 5"},
+   {h:"Forutsetningen",p:"Setningen gjelder bare for trekanter med en rett vinkel. Har trekanten ingen rett vinkel, gir regnestykket feil svar.",adv:"Sjekk at trekanten faktisk er rettvinklet før du bruker formelen."},
+   {h:"Hvor du finner det i praksis",p:"Setningen brukes til å finne avstander du ikke kan måle direkte: lengden på en stige mot en vegg, diagonalen i et rom, eller korteste vei over et jorde.",eks:"En stige 4 m fra veggen som når 3 m opp, er 5 m lang."}
+  ],
+  ov:[
+   {t:"Øving 1 · Finn hypotenusen",steg:[
+    {q:"En rettvinklet trekant har kateter på <b>3</b> og <b>4</b>. Hva er 3² + 4²?",kort:"Regnet ut katetene",fasit:["25","tjuefem","tjue fem"],
+     hint:"3² er 9 og 4² er 16. Legg dem sammen.",om:"Tegn kvadrater på hver av de to korte sidene.",naer:"Nesten. Regn ut hver potens først, så legg sammen.",lign:"Hva blir 6² + 8²?"},
+    {q:"Bra. Hypotenusen i andre er 25. Hvor lang er hypotenusen?",kort:"Tok kvadratrota",fasit:["5","fem"],
+     hint:"Hvilket tall ganget med seg selv blir 25?",om:"Du må gjøre det motsatte av å opphøye i andre.",naer:"Ikke del på 2 — ta kvadratrota.",lign:"Hvis hypotenusen i andre er 100, hvor lang er den?"}]},
+   {t:"Øving 2 · Bruk det i praksis",steg:[
+    {q:"En stige står <b>6 m</b> fra veggen og når <b>8 m</b> opp. Hva er 6² + 8²?",kort:"Satte opp regnestykket",fasit:["100","hundre"],
+     hint:"36 pluss 64.",om:"Stigen er hypotenusen i en rettvinklet trekant.",naer:"Nesten. Regn ut hver potens først.",lign:"Hva om den sto 5 m fra og nådde 12 m opp?"},
+    {q:"Hvor lang er stigen?",kort:"Fant stigen",fasit:["10","ti"],
+     hint:"Ta kvadratrota av 100.",om:"Hvilket tall ganget med seg selv gir 100?",naer:"Ikke del på 2.",lign:"Hvor lang blir den hvis 5² + 12² = 169?"}]}
+  ],
+  test:[
+   {q:"Hvilken side er hypotenusen?",alt:["Den korteste siden","Siden ved den rette vinkelen","Siden rett overfor den rette vinkelen","Alle er like"],r:2,f:"Hypotenusen ligger alltid rett overfor den rette vinkelen, og er den lengste siden."},
+   {q:"Kateter på 5 og 12. Hvor lang er hypotenusen?",alt:["13","17","15","60"],r:0,f:"5² + 12² = 25 + 144 = 169, og √169 = 13."},
+   {q:"Gjelder setningen for en trekant uten rett vinkel?",alt:["Ja, alltid","Nei, den krever en rett vinkel","Bare hvis sidene er like","Bare for store trekanter"],r:1,f:"Rett vinkel er selve forutsetningen. Uten den gir formelen feil svar."},
+   {q:"En elev regner 3² + 4² = 25 og svarer at hypotenusen er 25. Hva mangler?",alt:["Hun må gange med 2","Hun må ta kvadratrota","Hun må dele på 2","Ingenting"],r:1,f:"25 er hypotenusen opphøyd i andre. Svaret er √25 = 5."},
+   {q:"Et rom er 3 m bredt og 4 m langt. Hvor lang er diagonalen i gulvet?",alt:["7 m","12 m","5 m","3,5 m"],r:2,f:"Diagonalen er hypotenusen: 3² + 4² = 25, og √25 = 5 m."}
+  ]},
+
+ vekst:{
+  n:"Vekstfaktor",
+  m:"utforske og forklare sammenhengen mellom konstant prosentvis endring, vekstfaktor og eksponentialfunksjoner",
+  regel:"Vekstfaktoren er 1 pluss den prosentvise endringen skrevet som desimaltall.",
+  laer:[
+   {h:"Prosent som desimaltall",p:"Prosent betyr per hundre. For å gjøre om til desimaltall deler du på 100.",eks:"20 % = 0,20 og 7 % = 0,07"},
+   {h:"Hva vekstfaktoren er",p:"Vekstfaktoren er tallet du ganger med for å få den nye verdien i én operasjon. Ved økning beholder du alt du hadde, altså 1, og legger til endringen.",eks:"20 % økning gir vekstfaktor 1 + 0,20 = 1,20"},
+   {h:"Nedgang",p:"Går noe ned, trekker du fra i stedet. Vekstfaktoren blir da et tall mellom 0 og 1.",eks:"20 % nedgang gir vekstfaktor 1 − 0,20 = 0,80"},
+   {h:"Derfor er det nyttig",p:"Med vekstfaktor kan du regne flere år på én gang ved å opphøye. Skal noe vokse 5 % i året i 3 år, ganger du med 1,05 tre ganger.",eks:"1000 · 1,05³ ≈ 1157,63"},
+   {h:"Den vanligste fellen",p:"Mange tror at 20 % opp og deretter 20 % ned gir tilbake utgangspunktet. Det gjør det ikke, fordi prosenten regnes av ulike beløp.",adv:"1,20 · 0,80 = 0,96. Du ender 4 % lavere enn du startet."}
+  ],
+  ov:[
+   {t:"Øving 1 · Bygg vekstfaktoren",steg:[
+    {q:"Noe øker med <b>20 %</b>. Hva er 20 % skrevet som desimaltall?",kort:"Gjorde om prosent",fasit:["0,2","0.2","0,20","0.20"],
+     hint:"Prosent betyr per hundre. Del 20 på 100.",om:"20 av 100 deler. Hvordan skrives det med komma?",naer:"Nesten. Husk at prosent alltid deles på 100.",lign:"Hva er 35 % som desimaltall?"},
+    {q:"Du har hele beløpet <b>pluss</b> 20 % til. Hva må du gange med?",kort:"Fant vekstfaktoren",fasit:["1,2","1.2","1,20","1.20"],
+     hint:"Du beholder alt du hadde, altså 1, og legger til 0,2.",om:"100 % du hadde fra før, pluss 20 % til.",naer:"Nesten. Glem ikke det du hadde fra før.",lign:"Hva blir vekstfaktoren ved 8 % økning?"},
+    {q:"Hva blir vekstfaktoren hvis noe går <b>ned</b> 20 %?",kort:"Snudde regelen",fasit:["0,8","0.8","0,80","0.80"],
+     hint:"Du har igjen 1 minus 0,2.",om:"Går det ned, trekker du fra i stedet for å legge til.",naer:"Ikke helt. Tenk hvor stor del som er igjen.",lign:"Hva blir vekstfaktoren ved 5 % nedgang?"}]},
+   {t:"Øving 2 · Over flere år",steg:[
+    {q:"Du setter 1000 kr i banken med <b>5 %</b> rente. Hva er vekstfaktoren?",kort:"Fant faktoren",fasit:["1,05","1.05"],
+     hint:"5 % er 0,05. Legg til 1.",om:"Du beholder pengene og får litt til.",naer:"Nesten. Husk kommaplasseringen.",lign:"Hva blir den ved 2,5 % rente?"},
+    {q:"Etter <b>3 år</b>: hvor mange ganger må du gange med 1,05?",kort:"Så eksponenten",fasit:["3","tre"],
+     hint:"Én gang per år.",om:"Renten legges til hvert år.",naer:"Tell antall år.",lign:"Hvor mange ganger etter 10 år?"}]}
+  ],
+  test:[
+   {q:"Hva er vekstfaktoren ved 15 % økning?",alt:["0,15","1,15","15","0,85"],r:1,f:"15 % er 0,15. Du beholder alt du hadde (1) og legger til: 1 + 0,15 = 1,15."},
+   {q:"Hva er vekstfaktoren ved 30 % nedgang?",alt:["0,70","1,30","0,30","−0,30"],r:0,f:"Ved nedgang trekker du fra: 1 − 0,30 = 0,70. Du har 70 % igjen."},
+   {q:"En vare koster 400 kr og settes opp 25 %. Hva koster den nå?",alt:["425 kr","500 kr","425,50 kr","300 kr"],r:1,f:"Vekstfaktor 1,25. 400 · 1,25 = 500 kr."},
+   {q:"Noe øker 10 % og går deretter ned 10 %. Hva skjer?",alt:["Du er tilbake der du startet","Du ender 1 % lavere","Du ender 1 % høyere","Du ender 10 % lavere"],r:1,f:"1,10 · 0,90 = 0,99. Du ender 1 % lavere, fordi prosentene regnes av ulike beløp."},
+   {q:"1000 kr med 5 % rente i 2 år. Hvilket regnestykke er riktig?",alt:["1000 · 1,05 · 2","1000 · 1,10","1000 · 1,05²","1000 + 5 + 5"],r:2,f:"Renten legges til hvert år, så vekstfaktoren brukes to ganger: 1000 · 1,05²."}
+  ]},
+
+ monster:{
+  n:"Mønstre og algebra",
+  m:"utforske og generalisere geometriske mønstre og tallmønstre med egne ord og algebraisk",
+  regel:"Endringen per steg blir tallet foran n, og startverdien justerer konstantleddet.",
+  laer:[
+   {h:"Hva et mønster er",p:"Et tallmønster er en rekke der det skjer noe systematisk fra ett tall til det neste. Jobben din er å finne ut hva som skjer, og så beskrive det så presist at noen andre kan fortsette rekka uten deg.",eks:"5, 8, 11, 14, … øker med 3 hver gang"},
+   {h:"Lineære mønstre",p:"Er endringen like stor hver gang, kaller vi mønsteret lineært. Da kan du alltid skrive en regel på formen «noe ganger n pluss noe», der n er figurnummeret.",eks:"Øker med 3 → uttrykket inneholder 3n"},
+   {h:"Slik finner du konstantleddet",p:"Regn ut hva 3n gir for figur 1. Sammenlign med det figur 1 faktisk er. Differansen er konstantleddet du må legge til.",eks:"3·1 = 3, men figur 1 er 5. Differanse 2 → regel: 3n + 2"},
+   {h:"Test alltid på flere",p:"En regel som stemmer for figur 1 kan være tilfeldig. Sjekk minst to figurer til før du stoler på den.",adv:"Stemmer regelen din også for figur 4 og 5?"},
+   {h:"Figurmønstre",p:"I mønstre av fyrstikker eller brikker lønner det seg å se hvilken del som er lik hver gang, og hvilken del som vokser. Den faste delen blir konstantleddet, den voksende blir n-leddet.",eks:"4, 7, 10 fyrstikker → 3n + 1"}
+  ],
+  ov:[
+   {t:"Øving 1 · Finn regelen",steg:[
+    {q:"Mønsteret er <b>5, 8, 11, 14</b>. Hvor mye øker det med hver gang?",kort:"Fant endringen",fasit:["3","tre"],laerRef:1,
+     feilsvar:{"5":"5 er starttallet, ikke endringen. Se på forskjellen mellom to tall som står ved siden av hverandre.","8":"8 er det andre tallet. Regn ut 8 minus 5.","2":"Sjekk en gang til: hva er 8 minus 5?"},
+     hint:"Trekk det første tallet fra det andre.",om:"Hvor langt hopper du fra 5 til 8?",naer:"Nesten. Se på to tall som står etter hverandre.",lign:"Hvor mye øker 2, 9, 16, 23 med?"},
+    {q:"Da inneholder regelen <b>3n</b>. Hva gir 3n for figur nummer 1?",kort:"Testet uttrykket",fasit:["3","tre"],laerRef:2,
+     feilsvar:{"5":"5 er det figur 1 faktisk er. Spørsmålet er hva 3n alene gir når n = 1.","1":"n er 1, men uttrykket er 3 ganger n."},
+     hint:"Sett n = 1 inn i 3n.",om:"3 ganger 1.",naer:"Nesten. Bare gang 3 med 1.",lign:"Hva gir 4n for figur 1?"},
+    {q:"Figur 1 er <b>5</b>, men 3n gir 3. Hva må legges til?",kort:"Fant konstantleddet",fasit:["2","to"],laerRef:2,
+     feilsvar:{"3":"3 er det 3n ga deg. Vi leter etter differansen opp til 5.","8":"Du la sammen 3 og 5. Her skal du finne forskjellen."},
+     hint:"Hvor langt er det fra 3 til 5?",om:"Du mangler litt for å komme opp i 5.",naer:"Nesten. Regn 5 minus 3.",lign:"Hvis 4n gir 4 og figur 1 er 9, hva legges til?"}]},
+   {t:"Øving 2 · Bruk regelen",steg:[
+    {q:"Regelen er <b>3n + 2</b>. Hva blir figur nummer 20?",kort:"Hoppet langt fram",fasit:["62","sekstito","seksti to"],
+     feilsvar:{"60":"Du glemte konstantleddet. 3·20 er 60, men regelen har et pluss 2 til slutt.","23":"Du la sammen 20 og 3. Regelen sier gange, ikke plusse."},
+     hint:"Sett n = 20: 3 · 20, og legg til 2.",om:"Du trenger ikke tegne. Bruk regelen.",naer:"Nesten. Husk begge delene av regelen.",lign:"Hva blir figur 100?"},
+    {q:"Sjekk regelen: stemmer <b>3n + 2</b> også for figur 4?",kort:"Kontrollerte regelen",fasit:["ja","stemmer","14"],
+     hint:"3 · 4 + 2. Sammenlign med det fjerde tallet i rekka.",om:"Rekka var 5, 8, 11, 14.",naer:"Regn det ut og sammenlign.",lign:"Stemmer den for figur 3?"}]}
+  ],
+  test:[
+   {q:"Mønsteret 7, 11, 15, 19 øker med hvor mye?",alt:["3","4","7","11"],r:1,f:"11 − 7 = 4, og det samme mellom alle de andre. Endringen er 4."},
+   {q:"Hvilken regel passer til 4, 9, 14, 19?",alt:["5n","5n − 1","4n + 5","n + 5"],r:1,f:"Øker med 5, så 5n. For figur 1 gir 5n = 5, men figuren er 4. Altså 5n − 1."},
+   {q:"Regelen er 2n + 6. Hva er figur 12?",alt:["30","24","18","20"],r:0,f:"2 · 12 = 24, pluss 6 gir 30."},
+   {q:"Hvorfor bør du teste regelen på flere figurer?",alt:["Det ser grundigere ut","Fordi en regel kan stemme tilfeldig på én figur","Fordi læreren krever det","Det trenger du ikke"],r:1,f:"Mange feil regler treffer riktig på figur 1. Først når den stemmer på flere, vet du at den er riktig."},
+   {q:"En figurrekke har 6, 11, 16 fyrstikker. Hva er regelen?",alt:["6n","5n + 1","5n + 6","n + 5"],r:1,f:"Øker med 5. 5·1 = 5, men figur 1 er 6, så du legger til 1: 5n + 1."}
+  ]},
+
+ celle:{
+  n:"Celler",
+  m:"sammenligne celler hos ulike organismer og beskrive sammenhenger mellom oppbygning og funksjon",
+  regel:"Formen på en celle henger sammen med jobben den skal gjøre.",
+  laer:[
+   {h:"Cellen er byggesteinen",p:"Alt levende er bygget opp av celler. Noen organismer består av én eneste celle, mens et menneske har flere titalls billioner. Alle celler stammer fra andre celler som har delt seg.",eks:"Bakterier: én celle. Mennesker: mange billioner."},
+   {h:"Deler alle celler har",p:"Alle celler har en cellemembran som holder innholdet på plass og bestemmer hva som slipper inn og ut, og cytoplasma som er væsken der det meste skjer. Alle har også arvestoff.",eks:"Membran, cytoplasma og arvestoff finnes i alle celler."},
+   {h:"Plantecelle og dyrecelle",p:"Planteceller har tre ting dyreceller mangler: en stiv cellevegg utenpå membranen, grønnkorn med klorofyll, og en stor væskefylt saftboble. Det er derfor planter kan stå oppreist uten skjelett.",eks:"Cellevegg + grønnkorn + saftboble = plantecelle"},
+   {h:"Form følger funksjon",p:"Celler ser forskjellige ut fordi de gjør forskjellige jobber. En nervecelle er lang og trådformet for å sende signaler over avstand. En muskelcelle er avlang og kan trekke seg sammen. En rød blodcelle er flat og uten kjerne for å få plass til mest mulig oksygen.",eks:"Lang nervecelle = lange signalveier"},
+   {h:"Den vanligste misforståelsen",p:"Mange tror planteceller ikke har cellemembran fordi de har cellevegg. De har begge deler — veggen ligger utenpå membranen.",adv:"Cellevegg og cellemembran er ikke det samme."}
+  ],
+  ov:[
+   {t:"Øving 1 · Hva skiller dem",steg:[
+    {q:"Planteceller har en stiv del utenpå som dyreceller mangler. Hva heter den?",kort:"Fant celleveggen",fasit:["cellevegg","vegg"],laerRef:2,
+     feilsvar:{"membran":"Cellemembranen har begge to. Vi leter etter den stive delen som ligger utenpå membranen, og som bare planter har.","klorofyll":"Klorofyll er fargestoffet i grønnkornene. Vi leter etter noe stivt på utsiden."},
+     hint:"Den gjør at planten kan stå oppreist uten skjelett.",om:"Ordet begynner på celle og slutter på noe du finner i et hus.",naer:"Nesten. Tenk på noe stivt på utsiden.",lign:"Hva heter det tynne laget som alle celler har?"},
+    {q:"Hvilken del i plantecellen fanger sollyset?",kort:"Fant grønnkornene",fasit:["grønnkorn","gronnkorn","kloroplast","klorofyll"],
+     feilsvar:{"saftboble":"Saftbobla er en væskefylt sekk som gir cellen spenst. Den fanger ikke lys.","kjerne":"Cellekjernen styrer cellen og inneholder arvestoffet."},
+     hint:"De inneholder det grønne fargestoffet klorofyll.",om:"Det er disse som gjør bladene grønne.",naer:"Du er nær. Hva er det som er grønt i en plantecelle?",lign:"Hvorfor er blader grønne?"}]},
+   {t:"Øving 2 · Form og funksjon",steg:[
+    {q:"En nervecelle er lang og trådformet. Hvorfor tror du den er sånn?",kort:"Koblet form til jobb",fasit:["signal","beskjed","avstand","langt","melding"],
+     hint:"Hva er jobben til en nervecelle?",om:"Den skal få noe fra ett sted i kroppen til et annet.",naer:"Tenk på hva en nervecelle faktisk gjør.",lign:"Hvorfor er muskelceller avlange?"},
+    {q:"Røde blodceller mangler cellekjerne. Hva tror du de får plass til i stedet?",kort:"Så poenget med plassen",fasit:["oksygen","surstoff","hemoglobin"],
+     hint:"Hva er hovedoppgaven til røde blodceller?",om:"De frakter noe fra lungene og ut i kroppen.",naer:"Nesten. Hva er det blodet frakter rundt?",lign:"Hvorfor er de flate og bøyelige?"}]}
+  ],
+  test:[
+   {q:"Hvilke deler har både plante- og dyreceller?",alt:["Cellevegg og grønnkorn","Cellemembran og cytoplasma","Saftboble og cellevegg","Bare cellekjerne"],r:1,f:"Cellemembran, cytoplasma og arvestoff finnes i alle celler. Cellevegg, grønnkorn og saftboble er bare i planteceller."},
+   {q:"Har planteceller cellemembran?",alt:["Nei, de har bare cellevegg","Ja, membranen ligger innenfor veggen","Bare unge planteceller","Bare i røttene"],r:1,f:"Planteceller har begge deler. Celleveggen ligger utenpå cellemembranen."},
+   {q:"Hvorfor er nerveceller lange og trådformede?",alt:["For å veie mindre","For å sende signaler over avstand","For å lagre oksygen","For å dele seg raskere"],r:1,f:"Formen passer jobben: signalene skal fraktes langt, for eksempel fra foten til ryggmargen."},
+   {q:"Hva gjør grønnkornene?",alt:["Gir cellen stivhet","Fanger sollys til fotosyntesen","Lagrer vann","Styrer celledelingen"],r:1,f:"Grønnkornene inneholder klorofyll, som fanger sollyset planten bruker i fotosyntesen."},
+   {q:"Røde blodceller mangler kjerne. Hva er fordelen?",alt:["De lever lenger","Det blir mer plass til oksygen","De deler seg oftere","De blir sterkere"],r:1,f:"Uten kjerne blir det mer plass til hemoglobin, som binder oksygenet. Formen og innholdet passer oppgaven."}
+  ]},
+
+ foto:{
+  n:"Fotosyntese og karbonkretsløpet",
+  m:"gjøre rede for hvordan fotosyntese og celleånding gir energi til alt levende gjennom karbonkretsløpet",
+  regel:"Fotosyntesen lagrer solenergi i sukker, og celleåndingen frigjør den igjen.",
+  laer:[
+   {h:"Hva fotosyntesen gjør",p:"Planter tar opp karbondioksid fra lufta og vann fra jorda. Ved hjelp av energi fra sollys setter de dette sammen til sukker, og slipper ut oksygen som et biprodukt.",eks:"karbondioksid + vann + lysenergi → sukker + oksygen"},
+   {h:"Hvor energien kommer fra",p:"Det grønne fargestoffet klorofyll fanger opp lyset. Uten lys stopper prosessen, og det er derfor planter vokser dårlig om vinteren og i mørke rom.",eks:"Klorofyll gir bladene grønnfargen og fanger sollyset."},
+   {h:"Celleånding er det motsatte",p:"Alle levende celler, også plantenes egne, bryter ned sukker igjen for å frigjøre energien som ble lagret. Da brukes oksygen, og karbondioksid slippes ut.",eks:"sukker + oksygen → karbondioksid + vann + energi"},
+   {h:"Kretsløpet",p:"De to prosessene går i ring. Karbonet flytter seg mellom lufta, plantene og dyrene, mens energien fra sola flyter gjennom hele systemet og til slutt forsvinner som varme.",eks:"Karbon går i kretsløp. Energi går én vei."},
+   {h:"Den vanligste misforståelsen",p:"Mange tror planter bare driver fotosyntese og aldri celleånding. Planter gjør begge deler, hele døgnet. Om natten, uten lys, foregår bare celleåndingen.",adv:"Planter puster også. De bruker oksygen om natten."}
+  ],
+  ov:[
+   {t:"Øving 1 · Råstoffene",steg:[
+    {q:"Planten trenger vann og <b>én gass</b> fra lufta for å lage sukker. Hvilken?",kort:"Fant råstoffet",fasit:["karbondioksid","co2","co₂","karbondioksyd"],
+     hint:"Det er den samme gassen du puster ut.",om:"Gassen inneholder karbon, og heter noe med dioksid.",naer:"Ikke helt. Tenk på hva du puster ut, ikke inn.",lign:"Hvilken gass slipper planten ut i samme prosess?"},
+    {q:"Hvor kommer <b>energien</b> til fotosyntesen fra?",kort:"Fant energikilden",fasit:["sol","lys"],
+     hint:"Hva skjer med en plante som står helt mørkt?",om:"Klorofyllet fanger opp noe. Hva?",naer:"Nesten. Tenk på hvorfor planter står i vinduskarmen.",lign:"Hvorfor er det mindre vekst om vinteren?"}]},
+   {t:"Øving 2 · Kretsløpet",steg:[
+    {q:"Celleånding gjør det <b>motsatte</b> av fotosyntesen. Hva frigjøres da?",kort:"Så sammenhengen",fasit:["energi","varme"],
+     hint:"Sukkeret brytes ned igjen. Hva var lagret i det?",om:"Hvorfor må du spise for å orke å bevege deg?",naer:"Du er på sporet. Hva var det fotosyntesen lagret?",lign:"Hva skjer med karbonet når vi puster ut?"},
+    {q:"Siste: driver planter <b>også</b> celleånding? Svar ja eller nei.",kort:"Rettet en misforståelse",fasit:["ja"],
+     hint:"Plantens egne celler trenger også energi for å leve.",om:"Hva skjer med planten om natten, når det ikke er lys?",naer:"Tenk på hvordan planten får energi når det er mørkt.",lign:"Bruker planter oksygen om natten?"}]}
+  ],
+  test:[
+   {q:"Hvilke råstoffer bruker planten i fotosyntesen?",alt:["Oksygen og sukker","Karbondioksid og vann","Nitrogen og vann","Sukker og varme"],r:1,f:"Planten tar opp karbondioksid fra lufta og vann fra jorda, og bruker lysenergi til å lage sukker."},
+   {q:"Hva slipper planten ut i fotosyntesen?",alt:["Karbondioksid","Nitrogen","Oksygen","Metan"],r:2,f:"Oksygen er biproduktet. Det er denne prosessen som gir oss oksygenet vi puster inn."},
+   {q:"Hva er celleåndingens rolle?",alt:["Den lagrer energi i sukker","Den frigjør energien som er lagret i sukker","Den lager klorofyll","Den fanger sollys"],r:1,f:"Celleåndingen bryter ned sukker og frigjør energien. Fotosyntesen lagrer, celleåndingen frigjør."},
+   {q:"Driver planter celleånding?",alt:["Nei, bare fotosyntese","Ja, hele døgnet","Bare om sommeren","Bare når de blomstrer"],r:1,f:"Alle levende celler driver celleånding, også plantenes. Om natten foregår bare denne, siden det ikke er lys."},
+   {q:"Hva skjer med energien fra sola gjennom kretsløpet?",alt:["Den går i ring som karbonet","Den flyter gjennom og forsvinner til slutt som varme","Den blir borte med en gang","Den lagres for alltid i planten"],r:1,f:"Karbon går i kretsløp, men energi går én vei: fra sola, gjennom organismene, og ut som varme."}
+  ]}
+};
+
+const EMNER={
+ "mat-8":[{id:"pot"},{id:"brok"},{id:"lign"},{id:"monster"},
+  {id:null,n:"Funksjoner",m:"beskrive, sammenligne og utforske funksjoner knyttet til praktiske situasjoner"},
+  {id:null,n:"Ulikheter",m:"bruke ulike strategier for å løse ulikheter og vurdere om løsninger er gyldige"},
+  {id:null,n:"Programmering",m:"utforske hvordan algoritmer kan skapes, testes og forbedres ved hjelp av programmering"}],
+ "mat-9":[{id:"pyt"},
+  {id:null,n:"Formlikhet og kongruens",m:"utforske egenskapene ved ulike todimensjonale figurer og forklare begrepene formlikhet og kongruens"},
+  {id:null,n:"Overflate og volum",m:"bruke og argumentere for formler for overflateareal og volum av tredimensjonale figurer"},
+  {id:null,n:"Statistikk",m:"regne på sentralmål og spredningsmål i egne og reelle datasett og bruke resultatene til å beskrive dataene"},
+  {id:null,n:"Sannsynlighet",m:"beregne og vurdere sannsynlighet i statistikk og spill"},
+  {id:null,n:"Sammensatte måleenheter",m:"lage og løse problemer som handler om sammensatte måleenheter"}],
+ "mat-10":[{id:"vekst"},
+  {id:null,n:"Kvadratsetningene",m:"utforske kvadratsetningene geometrisk og algebraisk og bruke dem som regnestrategier"},
+  {id:null,n:"Ligningssett",m:"lage, løse og forklare ligningssett knyttet til praktiske situasjoner"},
+  {id:null,n:"Stigningstall",m:"forklare begrepet endring per enhet og regne ut stigningstallet til lineære funksjoner"},
+  {id:null,n:"Personlig økonomi",m:"hente ut og tolke relevant informasjon og reflektere over mulige konsekvenser ved kjøp og salg, renter på sparing, lån og kredittkjøp"},
+  {id:null,n:"Python",m:"lese og forklare tekstbasert programkode i Python"}],
+ "nor-8":[{id:"retorikk"},
+  {id:null,n:"Lesestrategier",m:"beskrive og reflektere over egen bruk av lesestrategier i lesing av skjønnlitteratur og sakprosa"},
+  {id:null,n:"Sjangre i skriving",m:"informere, fortelle, argumentere og reflektere i ulike muntlige og skriftlige sjangre og for ulike formål tilpasset mottaker og medium"},
+  {id:null,n:"Rettskriving og tegnsetting",m:"skrive tekster med funksjonell tekstbinding og riktig tegnsetting og mestre rettskriving og ordbøying på hovedmål og sidemål"},
+  {id:null,n:"Unges livssituasjon i tekst",m:"utforske og reflektere over hvordan tekster framstiller unges livssituasjon"},
+  {id:null,n:"Sammensatte tekster",m:"lage sammensatte tekster og begrunne valg av uttrykksformer"}],
+ "nor-9":[
+  {id:null,n:"Skjønnlitteratur og sakprosa",m:"lese skjønnlitteratur og sakprosa på bokmål og nynorsk og i oversettelse fra samiske og andre språk, og reflektere over tekstenes formål, innhold, sjangertrekk og virkemidler"},
+  {id:null,n:"Kildekritikk",m:"bruke kilder på en kritisk måte, markere sitater og vise til kilder på en etterrettelig måte i egne tekster"},
+  {id:null,n:"Grammatikk og tekststruktur",m:"bruke fagspråk og kunnskap om grammatikk, tekststruktur og sjanger i samtale om og bearbeiding av tekster"},
+  {id:null,n:"Svensk og dansk",m:"lytte til og lese tekster på svensk og dansk og gjøre rede for innhold og språklige trekk"},
+  {id:null,n:"Digitale medier og språk",m:"utforske og vurdere hvordan digitale medier påvirker og endrer språk og kommunikasjon"},
+  {id:null,n:"Kreativ skriving",m:"uttrykke seg i ulike sjangre og eksperimentere med sjangre på kreative måter"}],
+ "nor-10":[
+  {id:null,n:"Tolke tekster i kontekst",m:"sammenligne og tolke romaner, noveller, lyrikk og andre tekster ut fra historisk kontekst og egen samtid"},
+  {id:null,n:"Bokmål og nynorsk",m:"forklare den historiske bakgrunnen for bokmål og nynorsk og reflektere over statusen til de offisielle språkene i Norge i dag"},
+  {id:null,n:"Språklig mangfold",m:"utforske språklig variasjon og mangfold i Norge og reflektere over holdninger til ulike språk og talespråkvarianter"},
+  {id:null,n:"Argumentasjon og fagspråk",m:"bruke fagspråk og argumentere saklig i diskusjoner, samtaler, muntlige presentasjoner og skriftlige framstillinger om norskfaglige og tverrfaglige temaer"}],
+ "eng-8":[
+  {id:null,n:"Læringsstrategier",m:"bruke ulike strategier for språklæring, tekstskaping og kommunikasjon"},
+  {id:null,n:"Uttale",m:"bruke sentrale mønstre for uttale i kommunikasjon"},
+  {id:null,n:"Ordklasser og setningsbygning",m:"bruke kunnskap om ordklasser og setningsstruktur i arbeid med egne muntlige og skriftlige tekster"},
+  {id:null,n:"Rettskriving og tekststruktur",m:"følge regler for rettskriving, ordbøying, setningsstruktur og tekststruktur"},
+  {id:null,n:"Samtale og spørsmål",m:"stille spørsmål og følge opp innspill i samtaler om ulike emner tilpasset ulike formål, mottakere og situasjoner"},
+  {id:null,n:"Digitale ressurser",m:"bruke ulike digitale ressurser og andre hjelpemidler i språklæring, tekstskaping og samhandling"}],
+ "eng-9":[
+  {id:null,n:"Lese og presentere tekster",m:"lese, diskutere og presentere innhold fra ulike typer tekster, inkludert selvvalgte tekster"},
+  {id:null,n:"Skjønnlitteratur og ungdomslitteratur",m:"lese, tolke og reflektere over engelskspråklig skjønnlitteratur, inkludert ungdomslitteratur"},
+  {id:null,n:"Sakprosa og kildekritikk",m:"lese sakprosatekster og vurdere hvor pålitelige kildene er"},
+  {id:null,n:"Skrive formelle og uformelle tekster",m:"skrive formelle og uformelle tekster, inkludert sammensatte tekster med struktur og sammenheng som beskriver, forteller og reflekterer, og som er tilpasset formål, mottaker og situasjon"},
+  {id:null,n:"Flyt og ordforråd",m:"uttrykke seg med flyt og sammenheng med et variert ordforråd og idiomatiske uttrykk tilpasset formål, mottaker og situasjon"},
+  {id:null,n:"Varianter av engelsk",m:"lytte til og forstå ord og uttrykk i varianter av engelsk"}],
+ "eng-10":[
+  {id:null,n:"Engelsk i Norge og verden",m:"beskrive og reflektere over rollen engelsk har i Norge og i resten av verden"},
+  {id:null,n:"Urfolk i engelskspråklige land",m:"utforske og reflektere over situasjonen til urfolk i den engelskspråklige verden og i Norge"},
+  {id:null,n:"Levemåter og mangfold",m:"utforske og beskrive levemåter, tenkesett, kommunikasjonsmønstre og mangfold i den engelskspråklige verden"},
+  {id:null,n:"Kulturuttrykk",m:"utforske og presentere innhold fra kulturelle uttrykksformer i ulike medier fra den engelskspråklige verden, knyttet til egne interesser"},
+  {id:null,n:"Kildebruk",m:"bruke kilder på en kritisk og etterrettelig måte"},
+  {id:null,n:"Bearbeide egne tekster",m:"bearbeide egne tekster ut fra tilbakemeldinger og kunnskap om språk"},
+  {id:null,n:"Språklikheter og forskjeller",m:"utforske og beskrive noen språklige likheter og forskjeller mellom engelsk og andre språk eleven kjenner til, og bruke dette i egen språklæring"}],
+ "spr-8":[
+  {id:null,n:"Hilse og presentere deg",m:"bruke enkle og sentrale mønstre for uttale, ordforråd og setningsbygning i møte med andre"},
+  {id:null,n:"Ord og uttrykk i hverdagen",m:"forstå og bruke et ordforråd knyttet til kjente emner fra egen hverdag"},
+  {id:null,n:"Lytte og forstå",m:"forstå hovedinnhold i enkle, tydelige muntlige tekster om kjente emner"},
+  {id:null,n:"Enkle samtaler",m:"delta i enkle, spontane samtaler om kjente emner"}],
+ "spr-9":[
+  {id:null,n:"Lese enkle tekster",m:"lese og forstå tilpassede og autentiske tekster om personlige og dagsaktuelle emner"},
+  {id:null,n:"Skrive korte tekster",m:"skrive sammenhengende tekster om kjente emner tilpasset formål og mottaker"},
+  {id:null,n:"Språklæringsstrategier",m:"bruke egne erfaringer med språklæring i læringen av det nye språket"},
+  {id:null,n:"Digitale ressurser i språklæring",m:"bruke digitale ressurser og andre hjelpemidler i språklæring og kommunikasjon"}],
+ "spr-10":[
+  {id:null,n:"Kultur og levesett",m:"utforske og reflektere over levesett, tradisjoner og kulturuttrykk der språket snakkes"},
+  {id:null,n:"Sammenligne språk",m:"utforske likheter og forskjeller mellom det nye språket, norsk og andre språk eleven kjenner"},
+  {id:null,n:"Samtale om egne interesser",m:"uttrykke seg om egne interesser, opplevelser og meninger på det nye språket"},
+  {id:null,n:"Kommunikasjonsstrategier",m:"bruke ulike strategier for å gjøre seg forstått når ordforrådet ikke strekker til"}],
+ "nat-8":[
+  {id:null,n:"Utforsking og hypoteser",m:"stille spørsmål og lage hypoteser om naturfaglige fenomener, identifisere avhengige og uavhengige variabler og samle data for å finne svar"},
+  {id:null,n:"Kjemiske reaksjoner",m:"utforske kjemiske reaksjoner, forklare massebevaring og gjøre rede for betydninger av noen forbrenningsreaksjoner"},
+  {id:null,n:"Energi",m:"gjøre rede for energibevaring og energikvalitet og utforske ulike måter å omdanne, transportere og lagre energi på"},
+  {id:null,n:"Teknologiske systemer",m:"utforske, forstå og lage teknologiske systemer som består av en sender og en mottaker"},
+  {id:null,n:"Risiko og sikkerhet",m:"delta i risikovurderinger knyttet til forsøk og følge sikkerhetstiltakene"}],
+ "nat-9":[{id:"foto"},{id:"celle"},
+  {id:null,n:"Økosystemer",m:"utforske sammenhenger mellom abiotiske og biotiske faktorer i et økosystem og diskutere hvordan energi og materie omdannes i kretsløp"},
+  {id:null,n:"Evolusjon",m:"beskrive hvordan forskere har kommet fram til evolusjonsteorien og bruke denne til å forklare utvikling av biologisk mangfold"},
+  {id:null,n:"Platetektonikk",m:"bruke platetektonikkteorien til å forklare jordas utvikling over tid og gi eksempler på observasjoner som støtter teorien"},
+  {id:null,n:"Naturressurser",m:"gi eksempler på og drøfte aktuelle dilemmaer knyttet til utnyttelse av naturressurser og tap av biologisk mangfold"}],
+ "nat-10":[
+  {id:null,n:"Atommodeller",m:"bruke atommodeller og periodesystemet til å gjøre rede for egenskaper til grunnstoffer og kjemiske forbindelser"},
+  {id:null,n:"Drivhuseffekten",m:"beskrive drivhuseffekten og gjøre rede for faktorer som kan forårsake globale klimaendringer"},
+  {id:null,n:"Energi og miljø",m:"drøfte hvordan energiproduksjon og energibruk kan påvirke miljøet lokalt og globalt"},
+  {id:null,n:"Nervesystem og hormoner",m:"sammenligne nervesystemet og hormonsystemet og beskrive hvordan rusmidler, legemidler, miljøgifter og doping påvirker signalsystemene"},
+  {id:null,n:"Immunforsvar og vaksiner",m:"beskrive kroppens immunforsvar og hvordan vaksiner virker, og gjøre rede for hva vaksiner betyr for folkehelsen"},
+  {id:null,n:"Seksuell og reproduktiv helse",m:"drøfte spørsmål knyttet til seksuell og reproduktiv helse"}]
+};
+
+const $=id=>document.getElementById(id);
+let trinn=null,fag=null,emneId=null,ovIdx=0,i=0,bom=0,akt=null,skriv=null;
+let tIdx=0,tRiktig=0,tSvart=false;
+let S={trinn:null,fag:null,fremdrift:{},bok:[],lost:0,egne:{},fro:null,rekord:{}};
+try{const r=localStorage.getItem('peil:v5');if(r)S=Object.assign(S,JSON.parse(r));}catch(e){}
+if(!S.fro){
+  S.fro={vri:Math.random()*360,spenn:Math.random()*14,uro:0.7+Math.random()*2.4,
+         bred:1.3+Math.random()*0.5,hoy:0.78+Math.random()*0.3,id:Math.random().toString(36).slice(2,8)};
+}
+function lagre(){try{localStorage.setItem('peil:v5',JSON.stringify(S));}catch(e){}}
+function fr(id){if(!S.fremdrift[id])S.fremdrift[id]={laer:false,ov:[],test:null};return S.fremdrift[id];}
+function mestret(id){const f=S.fremdrift[id];return f&&f.test!==null&&f.test>=4;}
+
+function skjerm(id){document.querySelectorAll('.skjerm').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');
+ document.querySelectorAll('.nb').forEach(b=>b.classList.toggle('on',b.dataset.mal===id));window.scrollTo(0,0);}
+function merke(){
+  const v=$('valgt');v.innerHTML='';
+  if(trinn){const b=document.createElement('button');b.className='tagbtn';b.textContent=trinn+'. trinn';b.onclick=()=>skjerm('s1');v.appendChild(b);}
+  if(fag){const f=FAG.find(x=>x.id===fag);const b=document.createElement('button');b.className='tagbtn';b.textContent=f.n;b.onclick=()=>skjerm('s1');v.appendChild(b);}
+}
+[8,9,10].forEach(t=>{
+  const b=document.createElement('button');b.className='tr';b.innerHTML=t+'.<small>trinn</small>';
+  b.onclick=()=>{trinn=t;S.trinn=t;lagre();document.querySelectorAll('.tr').forEach(x=>x.classList.remove('valgt'));b.classList.add('valgt');merke();};
+  if(S.trinn===t){trinn=t;b.classList.add('valgt');}
+  $('trinnrad').appendChild(b);
+});
+FAG.forEach(f=>{
+  const b=document.createElement('button');b.className='fag'+(f.klar?'':' snart');
+  b.innerHTML='<span class="ik" style="background:'+f.f+'"></span><span class="n">'+f.n+'</span><span class="s">'+f.s+'</span>';
+  b.onclick=()=>{
+    if(!trinn){$('trinnrad').scrollIntoView({behavior:'smooth',block:'center'});return;}
+    if(!f.klar){alert(f.n+' kommer.\n\nPeil skal dekke alle teorifagene på ungdomstrinnet. Vi bygger ett fag om gangen og skriver alt innhold mot kompetansemålene, slik at kvaliteten holder. Matematikk og naturfag er klare nå.');return;}
+    fag=f.id;S.fag=f.id;lagre();merke();visRute();
+  };
+  $('fagnett').appendChild(b);
+});
+if(S.fag){fag=S.fag;merke();}
+
+function visRute(){
+  const liste=(EMNER[fag+'-'+trinn]||[]).map(e=>e.id&&EMNE[e.id]?{id:e.id,n:EMNE[e.id].n,m:EMNE[e.id].m}:{id:null,n:e.n,m:e.m});
+  const f=FAG.find(x=>x.id===fag),lp=LAEREPLAN[fag];
+  $('s2tittel').textContent=f.n+', '+trinn+'. trinn';
+  $('s2under').textContent='Undertekstene er kompetansemålene, ordrett fra '+lp.kode+'.';
+  let merk='';
+  if(lp.struktur==='etter 10. trinn')
+    merk='<div class="merknad">Læreplanen i '+f.n.toLowerCase()+' har bare kompetansemål etter 10. trinn, og sier ikke hva som hører til hvilket årstrinn. Fordelingen over 8., 9. og 10. er Peils egen, basert på vanlig praksis i norsk skole.</div>';
+  if(fag==='spr'){
+    const sp=S.konto&&S.konto.sprak?SPRAK[S.konto.sprak]:null;
+    merk='<div class="merknad">Utdanningsdirektoratet har <b>én felles læreplan</b> for alle fremmedspråk (FSP01-04). Kompetansemålene er de samme enten du har spansk, tysk eller fransk — det er bare språket som varierer.'
+      +(sp?' Øvingene dine er satt opp for <b>'+sp+'</b>.':' Du har ikke valgt språk ennå. Det gjør du under Konto.')+'</div>';
+  }
+  $('s2merk').innerHTML=merk;
+  const rute=$('rute');rute.querySelectorAll('.stopp').forEach(n=>n.remove());
+  let ferdig=0;
+  liste.forEach((e,n)=>{
+    const ok=e.id&&mestret(e.id), paa=e.id&&S.fremdrift[e.id]&&!ok;
+    if(ok)ferdig++;
+    const b=document.createElement('button');
+    b.className='stopp'+(ok?' ok':paa?' paa':'');
+    b.innerHTML='<span class="flagg">'+(ok?'✓':(n+1))+'</span><span class="sn">'+e.n+'</span><span class="sm">'+e.m+'</span>'+(e.id?'':'<span class="lock">Ikke klart ennå</span>');
+    b.onclick=()=>{if(e.id)visEmne(e.id);else alert('Dette emnet er ikke klart ennå. Innholdet skrives mot kompetansemålene, ett emne om gangen.');};
+    rute.appendChild(b);
+  });
+  $('rutefyll').style.height=liste.length?Math.round((ferdig/liste.length)*100)+'%':'0';
+  const egne=S.egne[fag+'-'+trinn]||[];
+  egne.forEach((e,n)=>{
+    const b=document.createElement('button');
+    b.className='stopp';b.style.borderStyle='dashed';
+    b.innerHTML='<span class="flagg">+</span><span class="sn">'+e.n+'</span><span class="sm">'+e.hva+'</span><span class="lock" style="color:var(--petrol-3)">Ditt eget tema · Peil veileder fritt</span>';
+    b.onclick=()=>startEget(n);
+    rute.appendChild(b);
+  });
+  skjerm('s2');
+}
+$('leggTil').onclick=()=>{
+  if(!trinn||!fag){skjerm('s1');return;}
+  $('egetNavn').value='';$('egetHva').value='';skjerm('s10');
+};
+$('tb10').onclick=()=>visRute();
+$('lagreEget').onclick=()=>{
+  const n=$('egetNavn').value.trim(),h=$('egetHva').value.trim();
+  if(!n){$('egetNavn').focus();return;}
+  const k=fag+'-'+trinn;
+  if(!S.egne[k])S.egne[k]=[];
+  S.egne[k].push({n:n,hva:h||'Lagt til av deg'});
+  lagre();visRute();
+};
+function startEget(n){
+  const e=S.egne[fag+'-'+trinn][n];
+  emneId=null;ovIdx=0;i=0;bom=0;
+  akt={t:e.n,steg:[{q:"Du har lagt inn <b>"+e.n+"</b>. Fortell meg hva du har prøvd så langt, så finner vi ut hvor det stopper.",
+    kort:"Beskrev hvor det stopper",fasit:[""],
+    naer:"Skriv hva du tenkte, selv om du tror det er feil. Det er der vi begynner.",
+    hint:"Hva var det første steget du gjorde? Og hva skjedde da?",
+    om:"Du kan også bare skrive hvilken del av oppgaven du ikke skjønner.",
+    lign:"Prøv å forklare oppgaven med dine egne ord, som om du skulle fortelle den til en venn."}]};
+  $('o3tittel').textContent=e.n;
+  sti.querySelectorAll('.node').forEach(x=>x.remove());
+  fyll.style.height='0';slutt.classList.remove('on');inn.style.display='';mld.classList.remove('on');
+  const d=document.createElement('div');d.className='node naa';d.id='n0';
+  d.innerHTML='<span class="kule">1</span><p class="nt">Beskrev hvor det stopper</p><p class="venter">venter…</p>';
+  sti.appendChild(d);
+  fjernBildet();nyttSteg();
+  skjerm('s3');si(tekstFor(akt.steg[0]));
+}
+
+/* --- emneside --- */
+function visEmne(id){
+  emneId=id;const e=EMNE[id],f=fr(id);
+  $('e6tittel').textContent=e.n;
+  $('e6maal').textContent=e.m;
+  const antOv=f.ov.filter(Boolean).length;
+  const nv=f.nivaa;
+  $('e6status').textContent=mestret(id)
+    ? 'Emnet er mestret. Du kan gjerne ta testen på nytt.'
+    : nv==='lav' ? 'Les først, øv deretter. Jeg har lagt inn en ekstra rolig runde på dette emnet.'
+    : nv==='hoy' ? 'Dette sitter godt. Jeg har låst opp en vanskeligere øving til deg.'
+    : 'Les først, øv deretter, og ta testen til slutt.';
+  const d=$('e6deler');d.innerHTML='';
+  const lag=(kl,merke,tt,ss,fn,laast)=>{
+    const b=document.createElement('button');
+    b.className='del '+kl+(laast?' laast':'');
+    b.innerHTML='<span class="m">'+merke+'</span><span><span class="tt">'+tt+'</span><span class="ss">'+ss+'</span></span>';
+    if(!laast)b.onclick=fn;
+    d.appendChild(b);
+  };
+  lag(f.laer?'ok':'','1',"Lær","Begreper og eksempler · "+e.laer.length+" deler",()=>visLaer());
+  const niv=f.nivaa||'ok';
+  let vist=0;
+  e.ov.forEach((o,n)=>{
+    if(o.niva==='ekstra'&&niv!=='lav'&&!f.ov[n])return;
+    if(o.niva==='utfordring'&&niv!=='hoy'&&!f.ov[n])return;
+    vist++;
+    const und=o.niva==='ekstra'?'Ekstra runde fordi dette satt litt tungt'
+      :o.niva==='utfordring'?'Vanskeligere — du er klar for dette'
+      :o.niva==='start'?'Rolig start · '+o.steg.length+' steg'
+      :o.steg.length+' steg med veiledning';
+    lag(f.ov[n]?'ok':'',(vist+1),o.t,und,()=>startOving(n),!f.laer);
+  });
+  const alleOv=e.ov.every((o,n)=>o.niva==='ekstra'||o.niva==='utfordring'||f.ov[n]);
+  const tst=f.test===null?"5 spørsmål uten hint":"Du fikk "+f.test+" av 5";
+  lag('test'+(mestret(id)?' ok':''),'✓',"Test",tst,()=>startTest(),!alleOv);
+  skjerm('s6');
+}
+
+/* --- lær --- */
+function visLaer(){
+  const e=EMNE[emneId];
+  $('l7tittel').textContent="Lær · "+e.n;
+  const c=$('l7innhold');c.innerHTML='';
+  e.laer.forEach(s=>{
+    const d=document.createElement('div');d.className='laer';
+    d.innerHTML='<h3>'+s.h+'</h3><p>'+s.p+'</p>'+(s.eks?'<div class="eks">'+s.eks+'</div>':'')+(s.adv?'<div class="adv">'+s.adv+'</div>':'');
+    c.appendChild(d);
+  });
+  skjerm('s7');
+}
+$('l7ferdig').onclick=()=>{fr(emneId).laer=true;lagre();visEmne(emneId);};
+
+/* --- øving --- */
+const sier=$('sier'),inp=$('svar'),mask=$('mask'),munn=$('munn'),
+mld=$('mld'),sti=$('sti'),fyll=$('fyll'),slutt=$('slutt'),inn=$('inn');
+function sprakNiva(){return (trinn||8)<=8?'enkel':'normal';}
+function tekstFor(steg){
+  if(sprakNiva()==='enkel'&&steg.enkel)return steg.enkel;
+  return steg.q;
+}
+function si(html){
+  clearInterval(skriv);
+  const ren=html.replace(/<[^>]+>/g,'');let n=0;sier.textContent='';
+  skriv=setInterval(()=>{n++;sier.textContent=ren.slice(0,n);if(n>=ren.length){clearInterval(skriv);sier.innerHTML=html;}},16);
+}
+function startOving(n){
+  ovIdx=n;akt=EMNE[emneId].ov[n];i=0;bom=0;
+  $('o3tittel').textContent=akt.t;
+  sti.querySelectorAll('.node').forEach(x=>x.remove());
+  fyll.style.height='0';slutt.classList.remove('on');inn.style.display='';mld.classList.remove('on');
+  fjernBildet();
+  akt.steg.forEach((s,k)=>{
+    const d=document.createElement('div');d.className='node'+(k===0?' naa':'');d.id='n'+k;
+    d.innerHTML='<span class="kule">'+(k+1)+'</span><p class="nt">'+s.kort+'</p><p class="venter">venter…</p>';
+    sti.appendChild(d);
+  });
+  rentSteg=0;steg0=akt.steg.length;hjelpBrukt=0;
+  nyttSteg();
+  skjerm('s3');si(tekstFor(akt.steg[0]));
+}
+
+/* ---- hjelpestige: aldri samme hjelp to ganger ---- */
+let stige=[],stigeN=0;
+function byggStige(){
+  const s=akt.steg[i],e=emneId?EMNE[emneId]:null;
+  stige=[
+   {n:"Et lite dytt",t:s.naer},
+   {n:"Konkret hint",t:s.hint},
+   {n:"En annen innfallsvinkel",t:s.om},
+   {n:"Prøv denne først",t:s.lign},
+  ];
+  if(e)(s.laerRef!==undefined?[e.laer[s.laerRef]]:e.laer.slice(0,2)).forEach(l=>{
+    if(l)stige.push({n:"Fra Lær · "+l.h,t:l.p,eks:l.eks,dyp:true});
+  });
+  stige.push({n:"Gå tilbake og les",t:e?"Nå har du fått all hjelpen jeg kan gi uten å røpe svaret. Gå tilbake til Lær-delen og les gjennom en gang til — så tar vi denne på nytt etterpå. Det er ikke juks, det er sånn man lærer.":"Nå har du fått hjelpen jeg kan gi på dette. Prøv å skrive så konkret du klarer hva du ikke får til, eller ta et bilde av oppgaven — så tar vi den derfra.",dyp:true});
+  stigeN=0;
+}
+function nyttSteg(){
+  byggStige();
+  $('gitt').innerHTML='';
+  $('hjelp').disabled=false;$('hjelp').textContent='Jeg står fast';
+  oppdaterNivaa();
+}
+function oppdaterNivaa(){
+  const igjen=stige.length-stigeN;
+  $('nivaa').textContent=stigeN===0?'':(igjen>0?igjen+' hjelp igjen på dette steget':'Ingen flere hint her');
+}
+function gi(kilde){
+  if(stigeN>=stige.length){$('hjelp').disabled=true;oppdaterNivaa();return;}
+  const h=stige[stigeN++];hjelpBrukt++;
+  const d=document.createElement('div');
+  d.className='hjelpekort'+(h.dyp?' dyp':'');
+  d.innerHTML='<p class="hn">'+(kilde==='feil'?'Fordi du bommet · ':'')+h.n+'</p><p class="ht">'+h.t+'</p>'+(h.eks?'<div class="eks2">'+h.eks+'</div>':'');
+  $('gitt').appendChild(d);
+  anim('tenk');setTimeout(()=>anim(null),950);
+  if(stigeN>=stige.length){$('hjelp').disabled=true;$('hjelp').textContent='Alt er gitt';}
+  oppdaterNivaa();
+  d.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+$('hjelp').onclick=()=>gi('bedt');
+
+/* ---- bilde ---- */
+function fjernBildet(){
+  $('forhaand').classList.remove('on');$('bilde').removeAttribute('src');
+  $('filKamera').value='';$('filVelg').value='';
+}
+function lastInn(input){
+  const f=input.files&&input.files[0];if(!f)return;
+  const les=new FileReader();
+  les.onload=e=>{
+    $('bilde').src=e.target.result;
+    $('forhaand').classList.add('on');
+    $('bildestatus').textContent='Peil leser oppgaven …';
+    anim('tenk');
+    setTimeout(()=>{
+      anim(null);
+      $('bildestatus').textContent='Peil har lest oppgaven. Du trenger ikke skrive noe.';
+      const s=akt.steg[i];
+      si('Jeg ser oppgaven. Vi tar den sammen — og du trenger ikke skrive den av. '+tekstFor(s).replace(/<[^>]+>/g,''));
+      inp.placeholder='Svar her, eller trykk Jeg står fast';
+      inp.focus();
+    },1600);
+  };
+  les.readAsDataURL(f);
+}
+$('btnKamera').onclick=()=>$('filKamera').click();
+$('btnFil').onclick=()=>$('filVelg').click();
+$('filKamera').onchange=function(){lastInn(this);};
+$('filVelg').onchange=function(){lastInn(this);};
+$('fjernBilde').onclick=fjernBildet;
+if(!('ontouchstart' in window)&&!navigator.maxTouchPoints)$('btnKamera').style.display='none';
+
+function ansikt(t){
+  const k1=$('kinn1'),k2=$('kinn2');
+  if(t==='glad'){munn.setAttribute('d','M45.2 55.8 Q50 61.6 54.8 55.8');$('oye1').setAttribute('r','3.8');$('oye2').setAttribute('r','3.8');k1.setAttribute('opacity','.75');k2.setAttribute('opacity','.75');}
+  else if(t==='bom'){munn.setAttribute('d','M46.4 59.6 Q50 56.8 53.6 59.6');$('oye1').setAttribute('r','2.7');$('oye2').setAttribute('r','2.7');k1.setAttribute('opacity','.35');k2.setAttribute('opacity','.35');}
+  else{munn.setAttribute('d','M46.4 57 Q50 60.4 53.6 57');$('oye1').setAttribute('r','3.4');$('oye2').setAttribute('r','3.4');k1.setAttribute('opacity','.5');k2.setAttribute('opacity','.5');}
+}
+function glimt(){['g1','g2','g3','g4'].forEach((id,n)=>{const e=$(id);e.classList.remove('on');void e.offsetWidth;setTimeout(()=>e.classList.add('on'),n*75);});}
+function anim(k){mask.classList.remove('jubel','tenk','sukk');void mask.offsetWidth;if(k)mask.classList.add(k);}
+function riktig(){
+  const v=inp.value.trim();
+  if(bom===0&&stigeN===0)rentSteg++;
+  anim('jubel');ansikt('glad');glimt();
+  const n=$('n'+i);n.classList.remove('naa');n.classList.add('ferdig');
+  n.querySelector('.venter').outerHTML='<span class="mitt">'+v+'</span>';
+  fyll.style.height=Math.round(((i+1)/akt.steg.length)*100)+'%';
+  S.lost++;inp.value='';mld.classList.remove('on');bom=0;i++;lagre();tegnBok();
+  setTimeout(()=>{
+    ansikt('vanlig');anim(null);
+    if(i<akt.steg.length){si(tekstFor(akt.steg[i]));$('n'+i).classList.add('naa');nyttSteg();fjernBildet();}
+    else{
+      inn.style.display='none';si('Der satt den. Du klarte hele resonnementet selv.');
+      if(!emneId){$('tilbakeEmne').textContent='Tilbake til ruta';$('tilbakeEmne').onclick=visRute;slutt.classList.add('on');return;}
+      const f=fr(emneId);f.ov[ovIdx]=true;
+      const andel=steg0?rentSteg/steg0:0;
+      f.nivaa=andel>=0.85&&hjelpBrukt<=1?'hoy':(andel<0.5||hjelpBrukt>=4?'lav':'ok');
+      lagre();
+      const e=EMNE[emneId];
+      const neste=e.ov.findIndex((o,n)=>!f.ov[n]);
+      $('tilbakeEmne').onclick=nesteDel;
+      $('tilbakeEmne').textContent=neste>=0?'Fortsett til '+e.ov[neste].t.split('·')[0].trim().toLowerCase():'Ta testen';
+      slutt.classList.add('on');
+    }
+  },1000);
+}
+function feil(){
+  bom++;anim('sukk');ansikt('bom');
+  const s=akt.steg[i],v=inp.value.trim().toLowerCase();
+  let spesifikk=null;
+  if(s.feilsvar)for(const n in s.feilsvar){if(v.includes(n)){spesifikk=s.feilsvar[n];break;}}
+  if(spesifikk){
+    mld.textContent=spesifikk;mld.classList.add('on');
+  }else{
+    mld.textContent=bom===1?'Ikke helt. Se hintet under, så prøver vi igjen.':'Fortsatt ikke. Jeg gir deg litt mer.';
+    mld.classList.add('on');
+  }
+  gi('feil');
+  setTimeout(()=>{ansikt('vanlig');anim(null);},1500);
+}
+function svar(){
+  const v=inp.value.trim().toLowerCase();
+  if(!v){mld.textContent='Skriv noe først, så ser vi på det sammen.';mld.classList.add('on');return;}
+  if(!emneId){
+    if(v.length<4){mld.textContent='Skriv litt mer, så har jeg noe å jobbe med.';mld.classList.add('on');return;}
+    riktig();return;
+  }
+  if(akt.steg[i].fasit.some(f=>v.includes(f)))riktig();else feil();
+}
+inp.addEventListener('input',()=>{if(mld.textContent.startsWith('Skriv noe'))mld.classList.remove('on');});
+$('send').addEventListener('click',svar);
+inp.addEventListener('keydown',e=>{if(e.key==='Enter')svar();});
+function tenk(txt){anim('tenk');setTimeout(()=>{anim(null);si(txt);},950);}
+function nesteDel(){
+  const e=EMNE[emneId],f=fr(emneId);
+  for(let n=0;n<e.ov.length;n++){if(!f.ov[n]){startOving(n);return;}}
+  if(f.laer)startTest();else visEmne(emneId);
+}
+$('tilbakeEmne').onclick=nesteDel;
+$('tb3').onclick=()=>visEmne(emneId);
+$('tb6').onclick=()=>visRute();
+$('tb7').onclick=()=>visEmne(emneId);
+$('tb8').onclick=()=>visEmne(emneId);
+setInterval(()=>{
+  if(mask.classList.contains('jubel'))return;
+  const a=$('oye1'),b=$('oye2'),r=a.getAttribute('r');
+  a.setAttribute('r','0.8');b.setAttribute('r','0.8');
+  setTimeout(()=>{a.setAttribute('r',r);b.setAttribute('r',r);},125);
+},4800);
+
+/* --- test --- */
+function startTest(){
+  tIdx=0;tRiktig=0;
+  $('t8tittel').textContent="Test · "+EMNE[emneId].n;
+  $('tfasit').innerHTML='';$('tkort').style.display='';
+  const p=$('tprog');p.innerHTML='';
+  EMNE[emneId].test.forEach(()=>{const d=document.createElement('span');d.className='tp';p.appendChild(d);});
+  visSporsmal();skjerm('s8');
+}
+function visSporsmal(){
+  tSvart=false;
+  const t=EMNE[emneId].test[tIdx];
+  $('tprog').children[tIdx].classList.add('on');
+  $('tq').textContent=(tIdx+1)+". "+t.q;
+  $('tforkl').classList.remove('on');$('tneste').style.display='none';
+  const c=$('talt');c.innerHTML='';
+  t.alt.forEach((a,n)=>{
+    const b=document.createElement('button');b.className='alt';b.textContent=a;
+    b.onclick=()=>velg(n,b);c.appendChild(b);
+  });
+}
+function velg(n,btn){
+  if(tSvart)return;tSvart=true;
+  const t=EMNE[emneId].test[tIdx];
+  [...$('talt').children].forEach((b,k)=>{
+    b.disabled=true;
+    if(k===t.r)b.classList.add('riktig');
+    else if(k===n)b.classList.add('galt');
+  });
+  if(n===t.r)tRiktig++;
+  $('tforkl').textContent=t.f;$('tforkl').classList.add('on');
+  $('tneste').textContent=tIdx<t.alt.length&&tIdx<EMNE[emneId].test.length-1?'Neste':'Se resultatet';
+  $('tneste').style.display='';
+}
+$('tneste').onclick=()=>{
+  tIdx++;
+  if(tIdx<EMNE[emneId].test.length)visSporsmal();else visResultat();
+};
+function visResultat(){
+  const e=EMNE[emneId],f=fr(emneId),tot=e.test.length,best=tRiktig>=4;
+  f.test=tRiktig;
+  if(best&&!S.bok.some(b=>b.t===e.regel))
+    S.bok.unshift({t:e.regel,e:e.n,f:fag,d:new Date().toLocaleDateString('nb-NO',{day:'numeric',month:'long'})});
+  lagre();tegnBok();
+  $('tkort').style.display='none';
+  $('tfasit').innerHTML='<div class="fasit '+(best?'best':'ikke')+'">'+
+    '<p class="score">'+tRiktig+' / '+tot+'</p>'+
+    '<p class="st">'+(best
+      ? 'Emnet er mestret. Regelen er lagt i boka di.'
+      : 'Du trenger 4 av 5 for å bestå. Ta en runde til på øvingene, så prøver du igjen.')+'</p>'+
+    '<button class="hoved full" id="fasitknapp">'+(best?'Tilbake til ruta':'Tilbake til emnet')+'</button></div>';
+  $('fasitknapp').onclick=()=>best?visRute():visEmne(emneId);
+}
+
+function stjernePos(n){
+  const f=S.fro;
+  const a=((n*137.508)+f.vri)*Math.PI/180;
+  const r=24+Math.sqrt(n+0.6)*(26+f.spenn);
+  const st=((Math.sin((n+1)*f.uro)*0.5+Math.sin((n+1)*f.uro*2.7)*0.3));
+  return{x:160+Math.cos(a)*r*f.bred+st*14,y:105+Math.sin(a)*r*f.hoy+st*9};
+}
+function tegnBok(){
+  $('teller').textContent=S.lost;
+  $('hsStjerner').textContent=S.bok.length;
+  const h=$('himmel');
+  if(!S.bok.length){
+    h.innerHTML='<div class="himmeltom"><p>Himmelen din er tom ennå.<br>Bestå en test, så tenner du din første stjerne.</p></div>';
+  }else{
+    const pos=S.bok.map((b,n)=>Object.assign(stjernePos(n),{b:b,n:n}));
+    let linjer='',stjerner='',stoev='';
+    for(let k=0;k<40;k++){
+      const x=(k*97)%320, y=(k*61)%210;
+      stoev+='<circle cx="'+x+'" cy="'+y+'" r="'+(0.5+(k%3)*0.3)+'" fill="#4E6B72" opacity="'+(0.25+(k%4)*0.1)+'"/>';
+    }
+    pos.forEach((p,n)=>{
+      const f=pos.find((q,k)=>k>n&&q.b.f===p.b.f);
+      if(f)linjer+='<line x1="'+p.x+'" y1="'+p.y+'" x2="'+f.x+'" y2="'+f.y+'" stroke="#C9963F" stroke-width="1" opacity=".3"/>';
+      const st=n===0?' ny':'';
+      stjerner+='<g class="stjerne'+st+'" data-n="'+n+'" role="button" tabindex="0">'+
+        '<circle cx="'+p.x+'" cy="'+p.y+'" r="16" fill="transparent"/>'+
+        '<path class="kropp" d="M'+p.x+' '+(p.y-11)+' C'+(p.x+1.6)+' '+(p.y-3.4)+' '+(p.x+3.4)+' '+(p.y-1.6)+' '+(p.x+11)+' '+p.y+
+        ' C'+(p.x+3.4)+' '+(p.y+1.6)+' '+(p.x+1.6)+' '+(p.y+3.4)+' '+p.x+' '+(p.y+11)+
+        ' C'+(p.x-1.6)+' '+(p.y+3.4)+' '+(p.x-3.4)+' '+(p.y+1.6)+' '+(p.x-11)+' '+p.y+
+        ' C'+(p.x-3.4)+' '+(p.y-1.6)+' '+(p.x-1.6)+' '+(p.y-3.4)+' '+p.x+' '+(p.y-11)+' Z" fill="#F4D28C" style="animation-delay:'+(n*0.4)+'s"/></g>';
+    });
+    h.innerHTML='<svg viewBox="0 0 320 210" role="img" aria-label="Stjernehimmelen din med '+S.bok.length+' stjerner">'+stoev+linjer+stjerner+'</svg>';
+    h.querySelectorAll('.stjerne').forEach(g=>{
+      const vis=()=>{
+        const b=S.bok[+g.dataset.n],v=$('valgtstjerne');
+        v.innerHTML='<p class="t">'+b.t+'</p><p class="d">'+b.e+' · '+b.d+'</p>';
+        v.classList.add('on');
+      };
+      g.onclick=vis;g.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')vis();};
+    });
+  }
+  const l=$('bokliste');l.innerHTML='';
+  S.bok.forEach(b=>{
+    const d=document.createElement('div');d.className='notat';
+    d.innerHTML='<p class="t">'+b.t+'</p><p class="d">'+b.e+' · '+b.d+'</p>';
+    l.appendChild(d);
+  });
+}
+tegnBok();
+function tegnLp(){
+  const dato=d=>new Date(d).toLocaleDateString('nb-NO',{day:'numeric',month:'long',year:'numeric'});
+  const l=$('lpliste');l.innerHTML='';
+  Object.values(LAEREPLAN).forEach(p=>{
+    const d=document.createElement('div');d.className='lp';
+    d.innerHTML='<p class="kode">'+p.kode+'</p><p class="fagn">'+p.navn+'</p>'+
+      '<div class="lpr"><span class="k">Fastsatt</span><span class="v">'+p.fastsatt+'</span></div>'+
+      '<div class="lpr"><span class="k">Gjelder fra</span><span class="v">'+dato(p.fra)+'</span></div>'+
+      '<div class="lpr"><span class="k">Struktur</span><span class="v">'+p.struktur+'</span></div>'+
+      '<div class="lpr"><span class="k">Kompetansemål 8.–10.</span><span class="v">'+p.maal+'</span></div>'+
+      '<p class="varsel'+(p.klar?'':' venter')+'">'+(p.klar?'Gjeldende versjon. Sist sjekket mot Udir i natt.':'Læreplanen er hentet. Innholdet skrives nå mot kompetansemålene.')+'</p>';
+    l.appendChild(d);
+  });
+}
+tegnLp();
+/* ================= KJØRETUREN ================= */
+const GRADER=[
+ {id:"lett",n:"Lett",s:"rolig fart",fart:2.4,tid:24,liv:5,tak:1.6,avstand:250,maksBlokk:1,minTid:14,trinn:[8]},
+ {id:"mid",n:"Middels",s:"vanlig",fart:3.2,tid:18,liv:4,tak:2.2,avstand:215,maksBlokk:2,minTid:11,trinn:[8,9]},
+ {id:"hard",n:"Tøff",s:"kvikk",fart:4.2,tid:14,liv:3,tak:2.8,avstand:185,maksBlokk:2,minTid:9,trinn:[9,10]},
+ {id:"brutal",n:"Brutal",s:"to liv",fart:5.2,tid:11,liv:2,tak:3.4,avstand:160,maksBlokk:2,minTid:7,trinn:[10]}
+];
+const BANER=4;
+let sFag=null,sGrad=GRADER[1],sKjorer=false,sLiv=3,sPoeng=0,sDist=0,
+    sBane=1,sSpm=null,sPool=[],sLoop=null,sTid=null,sHinderY=-60,sFart=3.2;
+const baner=[0.5,0.5,0.5];
+
+function spillFagKnapper(){
+  const c=$('spillFag');c.innerHTML='';
+  FAG.filter(f=>f.klar).forEach(f=>{
+    const b=document.createElement('button');b.className='fag'+(sFag===f.id?' valgt':'');
+    if(sFag===f.id){b.style.borderColor='#2F4A52';b.style.background='#EFE8DA';}
+    b.innerHTML='<span class="ik" style="background:'+f.f+'"></span><span class="n">'+f.n+'</span><span class="s">'+f.s+'</span>';
+    b.onclick=()=>{sFag=f.id;spillFagKnapper();};
+    c.appendChild(b);
+  });
+  const g=$('spillGrad');g.innerHTML='';
+  GRADER.forEach(x=>{
+    const b=document.createElement('button');b.className='gr'+(sGrad.id===x.id?' valgt':'');
+    b.innerHTML=x.n+'<small>'+x.s+'</small>';
+    b.onclick=()=>{sGrad=x;spillFagKnapper();};
+    g.appendChild(b);
+  });
+}
+spillFagKnapper();
+
+function byggPool(){
+  sPool=[];
+  const t=sGrad.trinn;
+  t.forEach(tr=>{
+    (EMNER[sFag+'-'+tr]||[]).forEach(e=>{
+      if(e.id&&EMNE[e.id])EMNE[e.id].test.forEach(q=>sPool.push({q:q,emne:EMNE[e.id].n+' · '+tr+'. trinn'}));
+    });
+  });
+  if(!sPool.length){
+    [8,9,10].forEach(tr=>{
+      (EMNER[sFag+'-'+tr]||[]).forEach(e=>{
+        if(e.id&&EMNE[e.id])EMNE[e.id].test.forEach(q=>sPool.push({q:q,emne:EMNE[e.id].n+' · '+tr+'. trinn'}));
+      });
+    });
+  }
+  for(let k=sPool.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[sPool[k],sPool[j]]=[sPool[j],sPool[k]];}
+}
+let blokker=[],sidenSist=0,sKombo=0,sGrunnfart=0,sJakt=false;
+
+function baneX(n){const v=$('vei').clientWidth;return (v/BANER)*n+(v/BANER-42)/2;}
+function settStriper(){
+  const v=$('vei').clientWidth;
+  for(let k=1;k<BANER;k++){const e=$('str'+k);if(e)e.style.left=(v/BANER)*k+'px';}
+}
+function plasserBil(){$('bil').style.left=baneX(sBane)+'px';}
+
+$('startSpill').onclick=()=>{
+  if(!sFag){$('spillFag').scrollIntoView({behavior:'smooth',block:'center'});return;}
+  byggPool();
+  if(!sPool.length){alert('Det er ingen ferdige emner i dette faget ennå.');return;}
+  sLiv=sGrad.liv;sPoeng=0;sDist=0;sBane=1;sKombo=0;
+  sPoliti=false;$('politi').classList.remove('on');$('sirene').classList.remove('on');
+  sBilBunn=130;$('bil').style.bottom='130px';
+  sGrunnfart=sGrad.fart;sFart=sGrad.fart;
+  blokker.forEach(b=>b.el.remove());blokker=[];sidenSist=999;
+  sJakt=false;$('politi').style.bottom='-110px';$('vei').classList.remove('jakt');
+  $('spillMeny').style.display='none';$('spillFlate').style.display='';
+  $('spillSlutt').innerHTML='';$('spm').classList.remove('on');
+  settStriper();oppdaterHud();plasserBil();
+  sKjorer=true;$('vei').classList.remove('pause');
+  clearInterval(sLoop);sLoop=setInterval(tikk,26);
+};
+function settVeifart(){
+  const d=Math.max(0.16,0.9/Math.max(0.6,sFart));
+  document.querySelectorAll('.stripe,.kant').forEach(e=>e.style.animationDuration=d+'s');
+}
+function kmt(){return Math.round(sFart*17);}
+function oppdaterHud(){
+  $('liv').textContent='♦'.repeat(Math.max(0,sLiv));
+  $('dist').textContent=Math.round(sDist);
+  $('poeng').textContent=sPoeng;
+  const f=$('kmt');if(f)f.textContent=kmt();
+}
+function lagBlokk(bane){
+  const d=document.createElement('div');
+  d.className='blokk';
+  d.textContent='?';
+  d.style.left=(baneX(bane)-5)+'px';
+  d.style.top='-50px';
+  $('hindre').appendChild(d);
+  blokker.push({el:d,bane:bane,y:-50});
+}
+function nyRad(){
+  const antall=1+Math.floor(Math.random()*sGrad.maksBlokk);
+  const ledige=[0,1,2,3];
+  for(let k=ledige.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[ledige[k],ledige[j]]=[ledige[j],ledige[k]];}
+  const valgte=ledige.slice(0,Math.min(antall,BANER-1));
+  valgte.forEach(b=>lagBlokk(b));
+}
+function tikk(){
+  if(!sKjorer)return;
+  sDist+=sFart*0.42;
+  sFart=sGrunnfart+Math.min(sGrad.tak,sDist/2600);
+  settVeifart();
+  const h=$('vei').clientHeight,bb=sBilBunn,bilTopp=h-bb-70,bilBunn=h-bb;
+  if(!sJakt&&sDist>=10000){startJakt();return;}
+  sidenSist+=sFart;
+  if(sidenSist>=sGrad.avstand){nyRad();sidenSist=0;}
+  for(let k=blokker.length-1;k>=0;k--){
+    const b=blokker[k];
+    b.y+=sFart;b.el.style.top=b.y+'px';
+    const nede=b.y+44;
+    if(nede>=bilTopp&&b.y<=bilBunn&&b.bane===sBane){
+      b.el.remove();blokker.splice(k,1);stillSporsmal();return;
+    }else if(b.y>h+10){
+      b.el.remove();blokker.splice(k,1);sKombo++;visKombo();
+    }
+  }
+  oppdaterHud();
+}
+let sPoliti=false,politiY=-120;
+function startPoliti(){
+  sPoliti=true;politiY=-74;
+  $('politi').classList.add('on');$('sirene').classList.add('on');
+  $('politi').style.left=baneX(sBane)+'px';
+  $('politi').style.bottom=politiY+'px';
+  $('sqEmne').textContent='';
+}
+function politiTikk(){
+  politiY+=0.62;
+  $('politi').style.bottom=politiY+'px';
+  $('politi').style.left=baneX(sBane)+'px';
+  if(politiY>=sBilBunn-12)arrestert();
+}
+function arrestert(){
+  sKjorer=false;clearInterval(sLoop);clearTimeout(sTid);
+  $('vei').classList.add('pause');
+  blokker.forEach(b=>b.el.remove());blokker=[];
+  $('spm').classList.remove('on');
+  const n=Math.round(sDist);
+  const k=sFag+'-'+sGrad.id;
+  if(n>(S.rekord[k]||0)){S.rekord[k]=n;lagre();}
+  const fagnavn=FAG.find(f=>f.id===sFag).n.toLowerCase();
+  $('spillSlutt').innerHTML='<div class="gslutt"><p class="n">Arrestert</p>'+
+   '<p class="l" style="margin-bottom:6px">Du kjørte '+n+' m og svarte riktig '+sPoeng+' ganger.</p>'+
+   '<p class="l"><b>Siktelse:</b> uforsvarlig høy kompetanse i '+fagnavn+'. '+
+   'Politiet ber deg roe ned til vanlig ungdomsskolenivå.</p>'+
+   '<button class="hoved full" id="spillIgjen" style="margin-top:16px">Kjør en gang til</button></div>';
+  $('spillIgjen').onclick=nullstillSpill;
+  $('spillSlutt').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function nullstillSpill(){
+  sPoliti=false;$('politi').classList.remove('on');$('sirene').classList.remove('on');
+  $('spillMeny').style.display='';$('spillFlate').style.display='none';spillFagKnapper();
+}
+function visKombo(){
+  if(sKombo<3)return;
+  const e=$('kombo');e.textContent='× '+sKombo;
+  e.classList.remove('vis');void e.offsetWidth;e.classList.add('vis');
+}
+function stillSporsmal(){
+  sKjorer=false;$('vei').classList.add('pause');
+  if(!sPool.length)byggPool();
+  sSpm=sPool.pop();
+  $('sqEmne').textContent=sSpm.emne;
+  $('sqTekst').textContent=sSpm.q.q;
+  const c=$('sqAlt');c.innerHTML='';
+  sSpm.q.alt.forEach((a,n)=>{
+    const b=document.createElement('button');b.className='alt';b.textContent=a;
+    b.onclick=()=>svarSpill(n,b);c.appendChild(b);
+  });
+  $('spm').classList.add('on');
+  $('spm').scrollIntoView({behavior:'smooth',block:'center'});
+  const t=Math.max(sGrad.minTid,sGrad.tid-Math.floor(sDist/1400));
+  $('tidsfyll').style.transition='none';$('tidsfyll').style.width='100%';
+  setTimeout(()=>{$('tidsfyll').style.transition='width '+t+'s linear';$('tidsfyll').style.width='0%';},40);
+  clearTimeout(sTid);sTid=setTimeout(()=>svarSpill(-1,null),t*1000);
+}
+function svarSpill(n,btn){
+  clearTimeout(sTid);
+  const r=sSpm.q.r;
+  [...$('sqAlt').children].forEach((b,k)=>{b.disabled=true;if(k===r)b.classList.add('riktig');else if(k===n)b.classList.add('galt');});
+  const ok=n===r;
+  if(ok){sPoeng++;sKombo++;sGrunnfart+=0.07;visKombo();}
+  else{
+    sLiv--;sKombo=0;sGrunnfart=Math.max(sGrad.fart,sGrunnfart-0.25);
+    $('bil').classList.add('krasj');setTimeout(()=>$('bil').classList.remove('krasj'),560);
+  }
+  oppdaterHud();
+  setTimeout(()=>{
+    $('spm').classList.remove('on');
+    if(sLiv<=0){spillSlutt();return;}
+    if(sDist>=10000){startJakt();return;}
+    sKjorer=true;$('vei').classList.remove('pause');
+    clearInterval(sLoop);sLoop=setInterval(tikk,26);
+  },ok?700:1700);
+}
+function startJakt(){
+  sJakt=true;sKjorer=false;clearInterval(sLoop);
+  blokker.forEach(b=>b.el.remove());blokker=[];
+  $('vei').classList.add('jakt');
+  const p=$('politi');
+  p.style.left=baneX(sBane)+'px';
+  void p.offsetWidth;
+  p.style.bottom='90px';
+  let flykt=0;
+  const jag=setInterval(()=>{
+    flykt++;
+    sBane=(sBane+(Math.random()<0.5?-1:1)+BANER)%BANER;
+    plasserBil();
+    setTimeout(()=>{p.style.left=baneX(sBane)+'px';},260);
+    if(flykt>=4){clearInterval(jag);setTimeout(arrestert,900);}
+  },900);
+}
+function arrestert(){
+  $('vei').classList.remove('jakt');
+  $('bil').classList.add('krasj');
+  const fagnavn=(FAG.find(f=>f.id===sFag)||{n:'faget'}).n.toLowerCase();
+  const n=Math.round(sDist);
+  const k=sFag+'-'+sGrad.id;
+  if(n>(S.rekord[k]||0)){S.rekord[k]=n;lagre();}
+  $('spillSlutt').innerHTML='<div class="arrest">'+
+   '<p class="stjut">Arrestert</p>'+
+   '<p class="sikt">Du passerte 10 000 meter uten å bomme nok. Politiet mistenker at du er for god i '+fagnavn+'.</p>'+
+   '<div class="papir">'+
+    '<div class="pr"><span>Siktelse</span><b>Grov kompetanse i '+fagnavn+'</b></div>'+
+    '<div class="pr"><span>Avstand</span><b>'+n+' m</b></div>'+
+    '<div class="pr"><span>Riktige svar</span><b>'+sPoeng+'</b></div>'+
+    '<div class="pr"><span>Toppfart</span><b>'+kmt()+' km/t</b></div>'+
+    '<div class="pr"><span>Vanskegrad</span><b>'+sGrad.n+'</b></div>'+
+   '</div>'+
+   '<button class="hoved full" id="spillIgjen">Rømme fra fengselet</button></div>';
+  $('spillIgjen').onclick=()=>{$('spillMeny').style.display='';$('spillFlate').style.display='none';$('bil').classList.remove('krasj');$('politi').style.bottom='-110px';spillFagKnapper();};
+  $('spillSlutt').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function spillSlutt(){
+  sKjorer=false;clearInterval(sLoop);$('vei').classList.add('pause');
+  blokker.forEach(b=>b.el.remove());blokker=[];
+  $('politi').style.bottom='-110px';$('vei').classList.remove('jakt');
+  const n=Math.round(sDist);
+  const k=sFag+'-'+sGrad.id;
+  const gammel=S.rekord[k]||0;
+  const ny=n>gammel;
+  if(ny){S.rekord[k]=n;lagre();}
+  $('spillSlutt').innerHTML='<div class="gslutt"><p class="n">'+n+' m</p>'+
+   '<p class="l">'+sPoeng+' riktige svar · '+sGrad.n+' · '+(ny?'Ny rekord!':'Rekorden din er '+gammel+' m')+'</p>'+
+   '<button class="hoved full" id="spillIgjen">Kjør en gang til</button></div>';
+  $('spillIgjen').onclick=nullstillSpill;
+}
+function styr(d){
+  if(!sKjorer)return;
+  const ny=sBane+d;
+  if(ny<0||ny>BANER-1)return;
+  sBane=ny;plasserBil();
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A')styr(-1);
+  if(e.key==='ArrowRight'||e.key==='d'||e.key==='D')styr(1);
+});
+$('vei').addEventListener('pointerdown',e=>{
+  const r=$('vei').getBoundingClientRect();
+  styr(e.clientX-r.left<r.width/2?-1:1);
+});
+window.addEventListener('resize',()=>{
+  if($('spillFlate').style.display!=='none'){
+    settStriper();plasserBil();
+    blokker.forEach(b=>b.el.style.left=(baneX(b.bane)-5)+'px');
+  }
+});
+
+
+/* ================= PORT: konto, plan, betaling ================= */
+const PLANER={en:{n:"Peil",pris:199}};
+const SPRAK={spansk:"spansk",tysk:"tysk",fransk:"fransk",annet:"et annet språk",fordypning:"språklig fordypning"};
+const PROVEDAGER=14;
+let valgtPlan="en",valgtBet="vipps";
+function nesteTrekk(){const d=new Date();d.setDate(d.getDate()+PROVEDAGER);return d;}
+function datoTxt(d){return d.toLocaleDateString('nb-NO',{day:'numeric',month:'long',year:'numeric'});}
+function portVis(id){
+  ['p_start','p_reg','p_plan','p_bet','p_sender','p_ferdig','p_logg','p_sjekk']
+    .forEach(k=>{const e=$(k);if(e)e.style.display=k===id?'':'none';});
+  $('port').scrollTop=0;
+}
+function gyldigEpost(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());}
+function merkFeil(id,feil){$(id).classList.toggle('feil',feil);return !feil;}
+
+$('kLag').onclick=()=>{portVis('p_reg');};
+$('kLogg').onclick=()=>{portVis('p_logg');};
+$('kRegTilbake').onclick=()=>portVis('p_start');
+$('kLoggTilbake').onclick=()=>portVis('p_start');
+$('kSjekkTilbake').onclick=()=>portVis('p_logg');
+$('kPlanTilbake').onclick=()=>portVis('p_reg');
+$('kBetTilbake').onclick=()=>portVis('p_plan');
+
+$('kRegNeste').onclick=()=>{
+  const ok1=merkFeil('f_navn',!$('r_navn').value.trim());
+  const ok2=merkFeil('f_epost',!gyldigEpost($('r_epost').value));
+  const ok3=merkFeil('f_elev',!$('r_elev').value.trim());
+  if(!$('r_samtykke').checked){alert('Du må samtykke for å opprette konto.');return;}
+  if(!(ok1&&ok2&&ok3))return;
+  $('planDato').textContent=datoTxt(nesteTrekk());
+  portVis('p_plan');
+};
+document.querySelectorAll('.planvalg').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.planvalg').forEach(x=>x.classList.remove('valgt'));
+  b.classList.add('valgt');valgtPlan=b.dataset.plan;
+});
+$('kPlanNeste').onclick=()=>{
+  const d=nesteTrekk();
+  $('betDato').textContent=datoTxt(d);
+  $('betDato2').textContent=datoTxt(d);
+  portVis('p_bet');
+};
+document.querySelectorAll('.betmetode').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.betmetode').forEach(x=>x.classList.remove('valgt'));
+  b.classList.add('valgt');valgtBet=b.dataset.bet;
+});
+$('kBetNeste').onclick=()=>{
+  $('senderTekst').textContent='Åpner Vipps …';
+  portVis('p_sender');
+  setTimeout(()=>{
+    const d=nesteTrekk();
+    S.konto={
+      navn:$('r_navn').value.trim(),
+      epost:$('r_epost').value.trim(),
+      elev:$('r_elev').value.trim(),
+      trinn:+$('r_trinn').value,
+      sprak:$('r_sprak').value||'',
+      plan:valgtPlan,bet:valgtBet,
+      status:'prove',
+      trekk:d.toISOString(),
+      opprettet:new Date().toISOString()
+    };
+    S.trinn=S.konto.trinn;trinn=S.konto.trinn;
+    lagre();
+    $('kvEpost').textContent=S.konto.epost;
+    $('kvElev').textContent=S.konto.elev+' · '+S.konto.trinn+'. trinn';
+    $('kvPlan').textContent=PLANER[valgtPlan].n+' · '+PLANER[valgtPlan].pris+' kr/mnd';
+    $('kvBet').textContent='Vipps';
+    $('kvDato').textContent=datoTxt(d);
+    $('ferdigTekst').textContent='Hei '+S.konto.navn.split(' ')[0]+'. De 14 gratisdagene er i gang, og '+S.konto.elev+' kan sette i gang med en gang.';
+    portVis('p_ferdig');
+  },1700);
+};
+$('kStart').onclick=()=>lukkPort();
+$('kSendLenke').onclick=()=>{
+  if(!merkFeil('f_lepost',!gyldigEpost($('l_epost').value)))return;
+  $('sjekkEpost').textContent=$('l_epost').value.trim();
+  portVis('p_sjekk');
+};
+$('kAapne').onclick=()=>{
+  if(!S.konto){
+    S.konto={navn:'',epost:$('l_epost').value.trim(),elev:'Eleven',trinn:S.trinn||8,
+      plan:'en',bet:'vipps',status:'prove',trekk:nesteTrekk().toISOString(),opprettet:new Date().toISOString()};
+    lagre();
+  }
+  lukkPort();
+};
+function lukkPort(){
+  $('port').classList.remove('on');
+  document.querySelectorAll('.tr').forEach(x=>x.classList.toggle('valgt',+x.textContent[0]===0));
+  if(S.konto&&S.konto.trinn){
+    trinn=S.konto.trinn;
+    document.querySelectorAll('.tr').forEach(x=>x.classList.remove('valgt'));
+    const idx=[8,9,10].indexOf(trinn);
+    if(idx>=0)$('trinnrad').children[idx].classList.add('valgt');
+    merke();
+  }
+  tegnKonto();
+}
+if(S.konto){$('port').classList.remove('on');}
+
+/* ---- kontoside ---- */
+$('aapneKonto').onclick=()=>{tegnKonto();skjerm('s10');};
+function tegnKonto(){
+  const c=$('kontoInnhold');if(!c)return;
+  if(!S.konto){c.innerHTML='<p class="tomt">Ingen konto.</p>';return;}
+  const k=S.konto,pl=PLANER[k.plan],d=new Date(k.trekk);
+  c.innerHTML=
+   '<div class="kfelt"><p class="kl">Foresatt</p><p class="kv">'+(k.navn||'—')+'</p><p class="kb">'+k.epost+'</p></div>'+
+   '<div class="kfelt"><p class="kl">Elev</p><p class="kv">'+k.elev+'</p><p class="kb">'+k.trinn+'. trinn'+(k.sprak?' · fremmedspråk: '+SPRAK[k.sprak]:'')+'</p></div>'+
+   '<div class="kfelt"><p class="kl">Abonnement</p><p class="kv">'+pl.pris+' kr/mnd · ingen bindingstid</p>'+
+     '<p class="kb">'+(k.status==='prove'?'14 dager gratis. Første trekk '+datoTxt(d)+'.':
+      k.status==='sagtopp'?'Sagt opp. Tilgang ut perioden, til '+datoTxt(d)+'.':'Fornyes '+datoTxt(d)+'.')+'</p></div>'+
+   '<div class="kfelt"><p class="kl">Betaling</p><p class="kv">Vipps</p>'+
+     '<p class="kb">Peil ser aldri kortnummeret ditt. Avtalen kan også stoppes direkte i Vipps-appen.</p></div>'+
+   (k.status==='sagtopp'
+     ? '<button class="hoved full" id="gjenoppta" style="margin-top:10px">Gjenoppta abonnementet</button>'
+     : '<button class="farlig" id="siOpp" style="display:block;margin:14px auto 0">Si opp abonnementet</button>')+
+   '<button class="farlig" id="slettAlt" style="display:block;margin:2px auto 0">Slett all data</button>'+
+   '<button class="farlig" id="loggUt" style="display:block;margin:2px auto 0;color:var(--petrol-2)">Logg ut</button>';
+  const so=$('siOpp');if(so)so.onclick=()=>{
+    if(confirm('Si opp abonnementet? Du beholder tilgangen ut perioden.')){S.konto.status='sagtopp';lagre();tegnKonto();}};
+  const gj=$('gjenoppta');if(gj)gj.onclick=()=>{S.konto.status='prove';lagre();tegnKonto();};
+  const sl=$('slettAlt');if(sl)sl.onclick=()=>{
+    if(confirm('Slette all data? Stjerner, fremdrift og konto blir borte. Dette kan ikke angres.')){
+      try{localStorage.removeItem('peil:v4');}catch(e){}
+      location.reload();
+    }};
+  const lu=$('loggUt');if(lu)lu.onclick=()=>{$('port').classList.add('on');portVis('p_start');};
+}
+tegnKonto();
+
+document.querySelectorAll('.nb').forEach(b=>b.addEventListener('click',()=>{
+  const m=b.dataset.mal;
+  if(m==='s9'){sKjorer=false;clearInterval(sLoop);blokker.forEach(b=>b.el.remove());blokker=[];$('spillMeny').style.display='';$('spillFlate').style.display='none';spillFagKnapper();skjerm('s9');return;}
+  if(m==='s2'){if(trinn&&fag)visRute();else skjerm('s1');}else skjerm(m);
+}));
+</script>
+</body>
+</html>
