@@ -22,6 +22,8 @@ export default async function OvingSide({
 
   return (
     <OvingKlient
+      emneSlug={slug}
+      ovingIdx={idx}
       tittel={oving.t}
       steg={oving.steg}
       laerKort={emne.laer}

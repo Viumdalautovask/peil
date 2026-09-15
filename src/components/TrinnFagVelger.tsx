@@ -1,13 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import type { FagInfo } from "@/lib/content";
+import { useFremdrift } from "@/lib/fremdrift/store";
 
 const TRINN = [8, 9, 10] as const;
 
 export function TrinnFagVelger({ fagListe }: { fagListe: FagInfo[] }) {
-  const [trinn, setTrinn] = useState<number>(8);
+  const { tilstand, settTrinnFag } = useFremdrift();
+  const trinn = tilstand.trinn ?? 8;
+
+  function velgTrinn(t: number) {
+    settTrinnFag(t, tilstand.fag);
+  }
 
   return (
     <>
@@ -15,7 +20,7 @@ export function TrinnFagVelger({ fagListe }: { fagListe: FagInfo[] }) {
         {TRINN.map((t) => (
           <button
             key={t}
-            onClick={() => setTrinn(t)}
+            onClick={() => velgTrinn(t)}
             className={
               "rounded-[18px] border-[1.5px] px-2 py-4 text-center font-display text-xl font-semibold " +
               (t === trinn
@@ -36,6 +41,7 @@ export function TrinnFagVelger({ fagListe }: { fagListe: FagInfo[] }) {
           <Link
             key={fag.id}
             href={fag.klar ? `/fag/${fag.id}/${trinn}` : "#"}
+            onClick={() => fag.klar && settTrinnFag(trinn, fag.id)}
             aria-disabled={!fag.klar}
             className={
               "block rounded-[18px] border-[1.5px] border-linje bg-kort p-3.5 text-left" +

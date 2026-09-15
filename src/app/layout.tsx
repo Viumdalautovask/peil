@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit, Public_Sans } from "next/font/google";
+import { FremdriftProvider } from "@/lib/fremdrift/store";
+import { BunnNav } from "@/components/BunnNav";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -27,7 +29,12 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="nb" className={`${outfit.variable} ${publicSans.variable}`}>
-      <body className="min-h-screen antialiased">{children}</body>
+      <body className="min-h-screen antialiased">
+        <FremdriftProvider>
+          {children}
+          <BunnNav />
+        </FremdriftProvider>
+      </body>
     </html>
   );
 }

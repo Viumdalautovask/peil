@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Maskot, type Bevegelse, type Uttrykk } from "./Maskot";
 import type { LaerKort, OvingSteg } from "@/lib/prototypeData";
+import { useFremdrift } from "@/lib/fremdrift/store";
 
 type HjelpKort = { n: string; t?: string; eks?: string; dyp?: boolean };
 
@@ -40,7 +41,7 @@ function EttSteg({
   trinnLavt: boolean;
   nrIRekka: number;
   antallSteg: number;
-  onRiktig: () => void;
+  onRiktig: (rentSteg: boolean, hjelpBruktHer: number) => void;
 }) {
   const [svarVerdi, setSvarVerdi] = useState("");
   const [bom, setBom] = useState(0);
@@ -69,11 +70,12 @@ function EttSteg({
     setBevegelse("jubel");
     setGlimtPa(true);
     setMelding(null);
+    const rent = bom === 0 && stigeN === 0;
     setTimeout(() => setGlimtPa(false), 950);
     setTimeout(() => {
       setUttrykk("vanlig");
       setBevegelse(null);
-      onRiktig();
+      onRiktig(rent, stigeN);
     }, 1000);
   }
 
@@ -232,6 +234,8 @@ function EttSteg({
 }
 
 export function OvingKlient({
+  emneSlug,
+  ovingIdx,
   tittel,
   steg,
   laerKort,
@@ -240,6 +244,8 @@ export function OvingKlient({
   nesteHref,
   nesteEtikett,
 }: {
+  emneSlug: string;
+  ovingIdx: number;
   tittel: string;
   steg: OvingSteg[];
   laerKort: LaerKort[];
@@ -248,8 +254,11 @@ export function OvingKlient({
   nesteHref: string;
   nesteEtikett: string;
 }) {
+  const { fullforOving } = useFremdrift();
   const [i, setI] = useState(0);
   const [ferdig, setFerdig] = useState(false);
+  const [rentSteg, setRentSteg] = useState(0);
+  const [hjelpBrukt, setHjelpBrukt] = useState(0);
 
   if (ferdig) {
     return (
@@ -287,9 +296,24 @@ export function OvingKlient({
         trinnLavt={trinnLavt}
         nrIRekka={i}
         antallSteg={steg.length}
-        onRiktig={() => {
-          if (i + 1 < steg.length) setI((n) => n + 1);
-          else setFerdig(true);
+        onRiktig={(rent, hjelpHer) => {
+          const nyttRentSteg = rentSteg + (rent ? 1 : 0);
+          const nyttHjelpBrukt = hjelpBrukt + hjelpHer;
+          setRentSteg(nyttRentSteg);
+          setHjelpBrukt(nyttHjelpBrukt);
+          if (i + 1 < steg.length) {
+            setI((n) => n + 1);
+          } else {
+            const andel = steg.length ? nyttRentSteg / steg.length : 0;
+            const nivaa =
+              andel >= 0.85 && nyttHjelpBrukt <= 1
+                ? "hoy"
+                : andel < 0.5 || nyttHjelpBrukt >= 4
+                ? "lav"
+                : "ok";
+            fullforOving(emneSlug, ovingIdx, nivaa);
+            setFerdig(true);
+          }
         }}
       />
     </main>

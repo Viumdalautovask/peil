@@ -15,6 +15,10 @@ export default async function TestSide({
 
   return (
     <TestKlient
+      emneSlug={slug}
+      emneNavn={emne.n}
+      fagId={fagId}
+      regel={emne.regel}
       tittel={`Test · ${emne.n}`}
       sporsmal={emne.test}
       tilbakeHref={basis}

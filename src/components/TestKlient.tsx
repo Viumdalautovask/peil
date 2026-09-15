@@ -3,18 +3,28 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { TestSporsmal } from "@/lib/prototypeData";
+import { useFremdrift } from "@/lib/fremdrift/store";
 
 export function TestKlient({
+  emneSlug,
+  emneNavn,
+  fagId,
+  regel,
   tittel,
   sporsmal,
   tilbakeHref,
   ferdigHref,
 }: {
+  emneSlug: string;
+  emneNavn: string;
+  fagId: string;
+  regel: string;
   tittel: string;
   sporsmal: TestSporsmal[];
   tilbakeHref: string;
   ferdigHref: string;
 }) {
+  const { registrerTest } = useFremdrift();
   const [i, setI] = useState(0);
   const [riktigeSvart, setRiktigeSvart] = useState(0);
   const [valgt, setValgt] = useState<number | null>(null);
@@ -33,6 +43,7 @@ export function TestKlient({
       setI((n) => n + 1);
       setValgt(null);
     } else {
+      registrerTest(emneSlug, riktigeSvart, regel, emneNavn, fagId);
       setFerdig(true);
     }
   }

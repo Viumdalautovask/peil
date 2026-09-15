@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { LaerFerdigKnapp } from "@/components/LaerFerdigKnapp";
 import { hentEmne } from "@/lib/content";
 
 export default async function Laerside({
@@ -48,12 +49,12 @@ export default async function Laerside({
         ))}
       </div>
 
-      <Link
-        href={emne.ov.length ? `/fag/${fagId}/${trinn}/${slug}/oving/0` : `/fag/${fagId}/${trinn}/${slug}`}
-        className="mt-3 block w-full rounded-[18px] bg-petrol px-6 py-3.5 text-center font-display text-[16.5px] font-semibold text-sand"
-      >
-        Jeg har lest — gå til øving
-      </Link>
+      <LaerFerdigKnapp
+        slug={slug}
+        nesteHref={
+          emne.ov.length ? `/fag/${fagId}/${trinn}/${slug}/oving/0` : `/fag/${fagId}/${trinn}/${slug}`
+        }
+      />
     </main>
   );
 }
