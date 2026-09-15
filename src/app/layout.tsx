@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Outfit, Public_Sans } from "next/font/google";
 import { FremdriftProvider } from "@/lib/fremdrift/store";
 import { BunnNav } from "@/components/BunnNav";
+import { PortalGate } from "@/components/PortalGate";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <FremdriftProvider>
           {children}
           <BunnNav />
+          <PortalGate />
         </FremdriftProvider>
       </body>
     </html>

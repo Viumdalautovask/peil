@@ -23,6 +23,7 @@ import {
 
 type Ctx = {
   tilstand: Tilstand;
+  lastet: boolean;
   settTrinnFag: (trinn: number | null, fag: string | null) => void;
   fremdriftFor: (slug: string) => FremdriftEmne;
   merkLaerLest: (slug: string) => void;
@@ -166,6 +167,7 @@ export function FremdriftProvider({ children }: { children: React.ReactNode }) {
   const verdi = useMemo<Ctx>(
     () => ({
       tilstand,
+      lastet,
       settTrinnFag,
       fremdriftFor,
       merkLaerLest,
@@ -178,6 +180,7 @@ export function FremdriftProvider({ children }: { children: React.ReactNode }) {
     }),
     [
       tilstand,
+      lastet,
       settTrinnFag,
       fremdriftFor,
       merkLaerLest,
