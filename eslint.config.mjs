@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Snapshot av prototypens egen kildekode — beholdt som referanse,
+    // ikke en del av den bygde appen.
+    "prototype/**",
   ]),
 ]);
 
