@@ -12,41 +12,8 @@
 //
 // Bruk: npm run seed
 
-import fs from "node:fs";
-import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
-
-const PROTOTYPE_PATH = path.join(process.cwd(), "prototype/peil-laering.html");
-
-type LaerKort = { h: string; p: string; eks?: string; adv?: string };
-type OvingSteg = {
-  q: string; enkel?: string; kort: string; fasit: string[];
-  hint?: string; om?: string; naer?: string; lign?: string;
-  laerRef?: number; feilsvar?: Record<string, string>;
-};
-type Oving = { t: string; niva?: string; steg: OvingSteg[] };
-type TestSporsmal = { q: string; alt: string[]; r: number; f: string };
-type Emne = { n: string; m: string; regel: string; laer: LaerKort[]; ov: Oving[]; test: TestSporsmal[] };
-type LaereplanRad = { kode: string; navn: string; fra: string; fastsatt: string; struktur: string; maal: number | string; klar: boolean };
-type EmnerRad = { id: string | null; n?: string; m?: string };
-
-function hentPrototypeData() {
-  const html = fs.readFileSync(PROTOTYPE_PATH, "utf8");
-  const start = html.indexOf("const LAEREPLAN=");
-  const end = html.indexOf("const $=id=>document.getElementById");
-  if (start === -1 || end === -1) {
-    throw new Error("Fant ikke datablokken (LAEREPLAN..EMNER) i " + PROTOTYPE_PATH);
-  }
-  const dataKode = html.slice(start, end);
-  // Ren datadeklarasjon uten DOM-kall — trygt å evaluere isolert.
-  const fn = new Function(`${dataKode}\nreturn { LAEREPLAN, FAG, EMNE, EMNER };`);
-  return fn() as {
-    LAEREPLAN: Record<string, LaereplanRad>;
-    FAG: unknown;
-    EMNE: Record<string, Emne>;
-    EMNER: Record<string, EmnerRad[]>;
-  };
-}
+import { hentPrototypeData } from "../src/lib/prototypeData";
 
 async function main() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
