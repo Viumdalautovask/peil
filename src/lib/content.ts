@@ -8,7 +8,7 @@
 // det byttet.
 
 import "server-only";
-import { hentPrototypeData, type Emne, type EmnerRad } from "./prototypeData";
+import { hentPrototypeData, type Emne, type EmnerRad, type TestSporsmal } from "./prototypeData";
 
 export type FagInfo = { id: string; navn: string; status: string; farge: string; klar: boolean };
 export type RutePunkt = {
@@ -50,4 +50,24 @@ export function hentEmne(slug: string): Emne | undefined {
 
 export function hentLaereplan() {
   return hentPrototypeData().LAEREPLAN;
+}
+
+export type SpillSporsmal = { spm: TestSporsmal; emneEtikett: string };
+
+/** Alle testspørsmål for et fags emner med innhold, per trinn — brukt som spørsmålspool i kjøreturen. */
+export function hentSpillPoolPerTrinn(fagId: string): Record<number, SpillSporsmal[]> {
+  const { EMNE, EMNER } = hentPrototypeData();
+  const pool: Record<number, SpillSporsmal[]> = {};
+  for (const trinn of [8, 9, 10]) {
+    const rader = EMNER[`${fagId}-${trinn}`] ?? [];
+    const sporsmal: SpillSporsmal[] = [];
+    for (const rad of rader) {
+      if (!rad.id) continue;
+      const emne = EMNE[rad.id];
+      if (!emne) continue;
+      for (const spm of emne.test) sporsmal.push({ spm, emneEtikett: `${emne.n} · ${trinn}. trinn` });
+    }
+    pool[trinn] = sporsmal;
+  }
+  return pool;
 }
